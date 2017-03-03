@@ -3,13 +3,14 @@ require_relative 'movie'
 require_relative 'netflix'
 require_relative 'theatre'
 
-nf = Netflix.new('movies.txt')
+nf = Netflix.new('lib/movies.txt')
 nf.pay(10)
 begin
-	nf.show(period: :new, genre: 'Comedy')
+	nf.show(period: :ancient)
 	rescue StandardError => e
 		puts "<#{e.class}: #{e.message}>"
 end
-
-th = Theatre.new('movies.txt')
-th.show('11.20')
+#nf.how_much?('The Kid')
+#th = Theatre.new('lib/movies.txt')
+#th.when?('The Kid')
+#th.show('15.20')

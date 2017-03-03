@@ -1,5 +1,5 @@
 class Netflix < MovieCollection
-	attr_reader :balance
+	attr_accessor :balance
 
 	def initialize(file)
 		super(file)
@@ -11,35 +11,25 @@ class Netflix < MovieCollection
 	end
 
 	def how_much?(title)
-		@movies.select{|movie| movie.title == title}.map{|movie| puts movie.price}
+		@movies.select{|movie| movie.title == title}[0].price
 	end
 
 	def show(options = {})
-		movies = []
-		options.each_pair do |key, value|
-			if value.class.to_s == 'Symbol'
-				movies << @movies.select{|movie| movie.send(key) == value}
-			else
-				movies << @movies.select{|movie| movie.send(key).include? value}
-			end
+		movies_after_filtering = []
+		options.each_pair do |key, value|	
+			movies_after_filtering << self.filter(key, value)
 		end
-		suitable_movies = movies.reject{|array| array.nil?}.inject(:+)
+		suitable_movies = movies_after_filtering.inject(:+)
+		if suitable_movies.length == 0
+			raise NameError, 'Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.'
+		end
 		movie_to_show = pick_movie_by_weight(suitable_movies)
 		if @balance < movie_to_show.price
-			raise StandardError, 'Не хватает денег'
+			raise StandardError, "Не хватает средств. Сейчас на балансе #{self.balance}, а данный фильм стоит #{movie_to_show.price}." 
 		end
-		case movie_to_show.class.to_s
-			when 'AncientMovie'
-				@balance -= 1
-			when 'ClassicMovie' 
-				@balance -= 1.5
-			when 'ModernMovie'
-				@balance -= 3
-			when 'NewMovie'
-				@balance -= 5
-			end
+		movie_to_show.change_balance
 		puts "Now showing #{movie_to_show.title}"	
-		movie_description(movie_to_show)
+		movie_to_show.description
 	end
 
 end
