@@ -1,25 +1,26 @@
 class Theatre < MovieCollection
 
-	SCHEDULE_TIME = {morning: (6..11), afternoon: (12..17), evening: (18..23)}
-	MORNING_SETTINGS = {class: AncientMovie}
-	AFTERNOON_SETTINGS = [{genre: 'Adventure'},{genre: 'Comedy'}]
-	EVENING_SETTINGS = [{genre: 'Drama'}, {genre: 'Horror'}]
+	FILTERS = {
+		morning: {time: (6..11), period: {period: :ancient}},
+		afternoon: {time: (12..17), genre: {genre:['Comedy', 'Adventure']}},
+		evening: {time: (18..23), genre: {genre:['Drama', 'Horror']}}
+	}
 
 	def initialize(file)
 		super(file)
-		@morning_movies = self.filter(MORNING_SETTINGS.keys.first, MORNING_SETTINGS.values.first)
-		@afternoon_movies = self.filter(AFTERNOON_SETTINGS[0].keys.first, AFTERNOON_SETTINGS[0].values.first) + self.filter(AFTERNOON_SETTINGS[1].keys.first, AFTERNOON_SETTINGS[1].values.first)
-		@evening_movies = self.filter(EVENING_SETTINGS[0].keys.first, EVENING_SETTINGS[0].values.first) + self.filter(EVENING_SETTINGS[1].keys.first, EVENING_SETTINGS[1].values.first)
+		@schedule = {FILTERS.keys[0] => self.filter(FILTERS[:morning][:period]), 
+					 FILTERS.keys[1] => self.filter(FILTERS[:afternoon][:genre]),
+					 FILTERS.keys[2] => self.filter(FILTERS[:evening][:genre])}
 	end
 
 	def show(time)
 		case time.to_i
-		when SCHEDULE_TIME[:morning]
-			movies_to_show = @morning_movies
-		when SCHEDULE_TIME[:afternoon]
-			movies_to_show = @afternoon_movies
-		when SCHEDULE_TIME[:evening]
-			movies_to_show = @evening_movies
+		when FILTERS[:morning][:time]
+			movies_to_show = @schedule[FILTERS.keys[0]]
+		when FILTERS[:afternoon][:time]
+			movies_to_show = @schedule[FILTERS.keys[1]]
+		when FILTERS[:evening][:time]
+			movies_to_show = @schedule[FILTERS.keys[2]]
 		end
 		movie_to_show = pick_movie_by_weight(movies_to_show)
 		puts "Now showing #{movie_to_show.title}"
@@ -27,23 +28,16 @@ class Theatre < MovieCollection
 	end
 
 	def when?(movie_title)
-		selected_movie = self.filter(:title, movie_title)
-		movies_in_schedule = [@morning_movies, @afternoon_movies, @evening_movies]
-		if !movies_in_schedule.inject(:+).include? selected_movie[0]
-			puts "В кинотеатре данный фильм не показывают"
-		end
-		movies_in_schedule.each do |day_part|
-			if day_part.include? selected_movie[0]
-				print "Фильм #{movie_title} показывают "
-				case day_part
-				when @morning_movies
-					puts "утром с #{SCHEDULE_TIME[:morning].first} до #{SCHEDULE_TIME[:morning].last}."	
-				when @afternoon_movies
-					puts "днем с #{SCHEDULE_TIME[:afternoon].first} до #{SCHEDULE_TIME[:afternoon].last}."
-				when @evening_movies
-					puts "вечером с #{SCHEDULE_TIME[:evening].first} до #{SCHEDULE_TIME[:evening].last}"	
-				end
+		selected_movie = self.filter(title: movie_title)[0]
+		in_schedule = false
+		@schedule.each do |key, value| 
+			if value.include? selected_movie
+				puts "#{selected_movie.title} показывают с #{FILTERS[key][:time].first} до #{FILTERS[key][:time].last}"
+				in_schedule = true
 			end
+		end
+		if !in_schedule
+			puts "Данный фильм в кинотеатре не показывают."
 		end
 	end
 
