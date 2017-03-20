@@ -21,6 +21,8 @@ class Movie
 				movie_class = ModernMovie
 		 	when 2000..Date.today.cwyear
 				movie_class = NewMovie
+			else
+				raise RuntimeError, "У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий."
 			end
 		movie_class.new(row["link"], row["title"], row["year"], row["country"],
 										  row["date"], row["genre"], row["length"], row["rating"],
@@ -38,20 +40,29 @@ class Movie
 		return "#{self.title} - "
 	end
 
+	def match_filters?(options)
+		movie_info = [genre, period].flatten
+		options_value = options.values[0]
+		if options_value.is_a?(Symbol)
+			movie_info.include? options_value
+		elsif options_value.is_a?(Array) 
+			!(options_value & movie_info).empty?
+		end
+	end
+
 end
 
 class AncientMovie < Movie
 
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
-		super(link, title, year, country, date, 
-			 	   genre, length, rating, director, actors, collection)
+		super
 		@price = 1
 	end
 
 	def description
 		super
-		return "старый фильм #{self.year}"
+		"старый фильм #{year}"
 	end
 
 end
@@ -60,14 +71,13 @@ class ClassicMovie < Movie
 
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
-		super(link, title, year, country, date, 
-			 	   genre, length, rating, director, actors, collection)
+		super
 		@price = 1.5
 	end
 
 	def description
 		super
-		return "классический фильм #{director} (ещё #{collection.stats(:director)[director] - 1} его фильмов в списке)"
+		"классический фильм #{director} (ещё #{collection.stats(:director)[director] - 1} его фильмов в списке)"
 	end
 
 end
@@ -76,14 +86,13 @@ class ModernMovie < Movie
 
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
-		super(link, title, year, country, date, 
-			 	   genre, length, rating, director, actors, collection)
+		super
 		@price = 3
 	end
 
 	def description
 		super
-		return "современное кино: играют #{self.actors.join(", ")}"
+		"современное кино: играют #{self.actors.join(", ")}"
 	end
 
 end
@@ -92,14 +101,13 @@ class NewMovie < Movie
 
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
-		super(link, title, year, country, date, 
-			 	   genre, length, rating, director, actors, collection)
+		super
 		@price = 5
 	end
 
 	def description
 		super
-		return "новинка, вышло #{Date.today.cwyear - self.year.to_i} лет назад"
+		"новинка, вышло #{Date.today.cwyear - self.year.to_i} лет назад"
 	end
 
 end

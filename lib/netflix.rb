@@ -24,7 +24,7 @@ class Netflix < MovieCollection
 	def show(options = {})
 		suitable_movies = self.filter(options)
 		if suitable_movies.length == 0
-			raise NameError, 'Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.'
+			raise RuntimeError, 'Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.'
 		end
 		movie_to_show = pick_movie_by_weight(suitable_movies)
 		if @balance < movie_to_show.price
