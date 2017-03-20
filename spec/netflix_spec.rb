@@ -6,26 +6,28 @@ describe Netflix do
 
 	let(:netflix) {Netflix.new('lib/movies.txt')}
 
+	before(:each) do 
+		netflix.pay(25)
+	end
+
 	context 'show' do
 		it 'changes balance with movie price' do
-			netflix.pay(25)
 			expect{netflix.show(title: 'The Kid')}.to change {netflix.balance}.from(25).to(24)
 		end
 
 		it 'shows title and description of the movie' do 
-			netflix.pay(25)
 			expect{netflix.show(title: 'The Kid')}.to output("Now showing The Kid\n").to_stdout
 		end
 
 		it 'raises error when balance is too low to show movie ' do
-			netflix.pay(1)
+			netflix.balance = 1
 			expect{netflix.show(title: 'Inception')}.to raise_error.with_message("Не хватает средств. Сейчас на балансе 1, а данный фильм стоит 5.")
 		end
 	end
 
 	context 'pay' do
 		it 'allows to refill balance' do
-			expect{netflix.pay(25)}.to change{netflix.balance}.from(0).to(25)
+			expect{netflix.pay(25)}.to change{netflix.balance}.from(25).to(50)
 		end
 
 		it 'cant accept payments < 1$' do
