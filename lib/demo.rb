@@ -10,19 +10,22 @@ begin
 		puts "<#{e.class}: #{e.message}>"
 end
 begin
-	p nf.show(title: 'The Best Years of Our Lives')
+	p nf.show(actors: 'Arnold Schwarzenegger')
 	rescue StandardError => e
 		puts "<#{e.class}: #{e.message}>"
 end
 #nf.how_much?('The Kid')
 th = Theatre.new('lib/movies.txt')
+=begin
 begin
-	th.when?('Tkek')
+	th.when?('The Kid')
 	rescue StandardError => e
 		puts "<#{e.class}: #{e.message}>"
 end
+
 begin
-	th.show('12.20')
+	th.show('15.20')
 	rescue StandardError => e
 		puts "<#{e.class}: #{e.message}>"
 end
+=end

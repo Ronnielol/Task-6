@@ -7,8 +7,8 @@ class Netflix < MovieCollection
 	end
 
 	def pay(amount)
-		if amount < 1 
-			raise StandardError, "Пополнить счет можно минимум на 1$"
+		if amount <= 0 
+			raise StandardError, "Нельзя пополнить счет на 0 или отрициательное значение."
 		end
 		@balance += amount
 	end

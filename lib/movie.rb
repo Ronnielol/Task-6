@@ -12,18 +12,11 @@ class Movie
 	end
 
 	def self.create(row, collection)
-		case row['year']
-			when 1900..1944
-				movie_class = AncientMovie
-			when 1945..1967
-				movie_class = ClassicMovie
-			when 1968..1999
-				movie_class = ModernMovie
-		 	when 2000..Date.today.cwyear
-				movie_class = NewMovie
-			else
-				raise RuntimeError, "У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий."
-			end
+		_,period_settings = PERIODS.detect{ |period, value| value[:years] === row['year']}
+		if period_settings.nil?
+			raise RuntimeError, "У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий."
+		end
+		movie_class = period_settings[:movie_class] 
 		movie_class.new(row["link"], row["title"], row["year"], row["country"],
 										  row["date"], row["genre"], row["length"], row["rating"],
 										  row["director"], row["actors"], collection)
@@ -36,18 +29,17 @@ class Movie
 	   	@genre.include? genre
   	end
 
-  	def description
-		return "#{self.title} - "
+	def matches?(filters)
+		filters.any? { |filter_name, filter_value| match_filter?(filter_name, filter_value) }
 	end
 
-	def match_filters?(options)
-		movie_info = [genre, period].flatten
-		options_value = options.values[0]
-		if options_value.is_a?(Symbol)
-			movie_info.include? options_value
-		elsif options_value.is_a?(Array) 
-			!(options_value & movie_info).empty?
-		end
+	def match_filter?(filter_name, filter_value)
+  		value = send(filter_name)
+  		value.is_a?(Array) ? value.any? { |v| value_match?(v, filter_value) } : value_match?(value, filter_value)
+	end
+
+	def value_match?(value, filter_value)
+  		filter_value.is_a?(Array) ? filter_value.any? { |fv| fv === value } : filter_value === value
 	end
 
 end
@@ -61,8 +53,7 @@ class AncientMovie < Movie
 	end
 
 	def description
-		super
-		"старый фильм #{year}"
+		"#{title} - старый фильм #{year}"
 	end
 
 end
@@ -76,8 +67,7 @@ class ClassicMovie < Movie
 	end
 
 	def description
-		super
-		"классический фильм #{director} (ещё #{collection.stats(:director)[director] - 1} его фильмов в списке)"
+		"#{title} - классический фильм #{director} (ещё #{collection.stats(:director)[director] - 1} его фильмов в списке)"
 	end
 
 end
@@ -91,8 +81,7 @@ class ModernMovie < Movie
 	end
 
 	def description
-		super
-		"современное кино: играют #{self.actors.join(", ")}"
+		"#{title} - современное кино: играют #{actors.join(", ")}"
 	end
 
 end
@@ -106,8 +95,14 @@ class NewMovie < Movie
 	end
 
 	def description
-		super
-		"новинка, вышло #{Date.today.cwyear - self.year.to_i} лет назад"
+		"#{title} - новинка, вышло #{Date.today.cwyear - year.to_i} лет назад"
 	end
 
 end
+
+PERIODS = {
+		ancient: { years: 1900..1944, movie_class: AncientMovie },
+		classic: { years: 1945..1967, movie_class: ClassicMovie },
+		modern: { years: 1968..1999, movie_class: ModernMovie },
+		new: { years: 2000..Date.today.cwyear, movie_class: NewMovie }
+	}

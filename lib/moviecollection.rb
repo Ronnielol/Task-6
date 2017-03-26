@@ -16,24 +16,8 @@ class MovieCollection
 			.each_with_object(Hash.new(0)) { |o, h| h[o] += 1 }
 	end
 
-	def filter(options)
-		values_array = []
-		options.map{ |key, values|
-			if !values.is_a? Array
-				values_array << values
-			else 
-				values_array = values
-			end
-			if values_array.map(&:class).include? Symbol
-				values_array.map{|value| 
-						@movies.select{|movie| movie.send(key) == value}
-					}.inject(:+)
-			else
-				values_array.map{|value| 
-						@movies.select{|movie| movie.send(key).include? value}
-					}.inject(:+)
-			end
-		}.inject(:+).uniq
+	def filter(filters)
+		@movies.select{|movie| movie.matches?(filters)}
 	end
 
 	private

@@ -23,8 +23,8 @@ class Theatre < MovieCollection
 		if selected_movie.nil?
 			raise RuntimeError, 'Не найдено подходящих фильмов. Проверьте правильность ввода.'
 		end
-		daytime = SCHEDULE.detect{ |name, options| selected_movie.match_filters?(options[:filters])}[0]
-		puts "#{selected_movie.title} показывают с #{SCHEDULE[daytime][:time].first} до #{SCHEDULE[daytime][:time].last}"
+		daytime,_ = SCHEDULE.detect{ |name, options| selected_movie.matches?(options[:filters])}
+		"#{selected_movie.title} показывают с #{SCHEDULE[daytime][:time].first} до #{SCHEDULE[daytime][:time].last}"
 	end
 
 	private 

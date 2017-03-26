@@ -6,37 +6,41 @@ describe Movie do
 
 	context 'create' do
 
-		let(:csv) {CSV.foreach('spec/spec_movies.txt', col_sep: '|', headers: %w{link title year country date 
-			 genre length rating director actors}, force_quotes: 'false', converters: [:numeric]).map{|row| row}}
+		let(:collection) {MovieCollection.new('lib/movies.txt')}
+
+		let(:ancient_movie_row) {{"link" => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', "title" => 'Double Indemnity', "year" => 1944, "country" => 'USA', "date" => '1944-04-24', "genre" => 'Crime,Drama,Film-Noir', "length" => '107 min', "rating" => '8.4', "director" => 'Billy Wilder', "actors" => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson'}}
+
+		let(:classic_movie_row) {{"link" => 'http://imdb.com/title/tt0061722/?ref_=chttp_tt_248', "title" => 'The Graduate', "year" => 1967, "country" => 'USA', "date" => '1967-12-22', "genre" => 'Comedy,Drama,Romance', "length" => '106 min', "rating" => '8.0', "director" => 'Mike Nichols', "actors" => 'Dustin Hoffman,Anne Bancroft,Katharine Ross'}}
+
+		let(:modern_movie_row) {{"link" => 'http://imdb.com/title/tt0105236/?ref_=chttp_tt_78', "title" => 'Reservoir Dogs', "year" => 1992, "country" => 'USA', "date" => '1992-09-02', "genre" => 'Crime,Drama', "length" => '99 min', "rating" => '8.4', "director" => 'Quentin Tarantino', "actors" => 'Harvey Keitel,Tim Roth,Michael Madsen'}}
+
+		let(:new_movie_row) {{"link" => 'http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', "title" => 'Memento', "year" => 2000, "country" => 'USA', "date" => '2001-05-25', "genre" => 'Mystery,Thriller', "length" => '113 min', "rating" => '8.5', "director" => 'Christopher Nolan', "actors" => 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano'}}
+
+		let(:error_row) {{"link" => 'http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', "title" => 'Toy Story 4', "year" => 2019, "country" => 'USA', "date" => '2001-05-25', "genre" => 'Mystery,Thriller', "length" => '113 min', "rating" => '8.5', "director" => 'Christopher Nolan', "actors" => 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano'}}
 
 		it 'creates movie with class AncientMovie on year 1900..1944' do
 			# Double Indemnity|1944
-			row = csv[0]
-			expect(Movie.create(row, 'collection')).to be_a(AncientMovie)
+			expect(Movie.create(ancient_movie_row, collection)).to be_a(AncientMovie)
 		end
 
-		it 'creates movie with class AncientMovie on year 1945..1967' do
+		it 'creates movie with class ClassicMovie on year 1945..1967' do
 			# The Graduate|1967
-			row = csv[1]
-			expect(Movie.create(row, 'collection')).to be_a(ClassicMovie)
+			expect(Movie.create(classic_movie_row, 'collection')).to be_a(ClassicMovie)
 		end
 
 		it 'creates movie with class ModernMovie on year 1968..1999' do
 			# Once Upon a Time in the West|1968
-			row = csv[2]
-			expect(Movie.create(row, 'collection')).to be_a(ModernMovie)
+			expect(Movie.create(modern_movie_row, 'collection')).to be_a(ModernMovie)
 		end
 
 		it 'creates movie with class NewMovie on year 2000..today' do
 			# Once Upon a Time in the West|1968
-			row = csv[3]
-			expect(Movie.create(row, 'collection')).to be_a(NewMovie)
+			expect(Movie.create(new_movie_row, 'collection')).to be_a(NewMovie)
 		end
 
 		it 'throws an error when movie year is not in appropriate diapason' do
 			# Once Upon a Time in the West|1968
-			row = csv[4]
-			expect{Movie.create(row, 'collection')}.to raise_error.with_message("У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий.")
+			expect{Movie.create(error_row, 'collection')}.to raise_error.with_message("У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий.")
 		end
 
 	end
@@ -52,7 +56,7 @@ describe AncientMovie do
 			 	   'Drama,Romance,War', '102 min', '8.6', 'Michael Curtiz', 'Humphrey Bogart,Ingrid Bergman,Paul Henreid', collection)}
 
 	context 'description' do
-			its(:description) {is_expected.to eq('старый фильм 1942')}
+			its(:description) {is_expected.to eq('Casablanca - старый фильм 1942')}
 	end
 
 	context 'initialize' do 
@@ -72,7 +76,7 @@ describe ClassicMovie do
 			 	   'Drama,Romance,War', '172 min', '8.2', 'William Wyler', 'Fredric March,Dana Andrews,Myrna Loy', collection)}
 
 	context 'description' do
-		its(:description) {is_expected.to eq('классический фильм William Wyler (ещё 2 его фильмов в списке)')} 
+		its(:description) {is_expected.to eq('The Best Years of Our Lives - классический фильм William Wyler (ещё 2 его фильмов в списке)')} 
 	end
 
 	context 'initialize' do 
@@ -92,7 +96,7 @@ describe ModernMovie do
 			 	   'Crime,Drama', '142 min', '9.3', 'Frank Darabont', 'Tim Robbins,Morgan Freeman,Bob Gunton', collection)}
 
 	context 'description' do
-		its(:description) {is_expected.to eq('современное кино: играют Tim Robbins, Morgan Freeman, Bob Gunton')}
+		its(:description) {is_expected.to eq('The Shawshank Redemption - современное кино: играют Tim Robbins, Morgan Freeman, Bob Gunton')}
 	end
 
 	context 'initialize' do 
@@ -111,7 +115,7 @@ describe NewMovie do
 	subject {NewMovie.new('http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', 'Memento', 2000, 'USA', '2001-05-25', 'Mystery,Thriller', '113 min', '8.5', 'Christopher Nolan', 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano', collection)}
 
 	context 'description' do
-		its(:description) {is_expected.to eq("новинка, вышло #{Date.today.cwyear - subject.year} лет назад")}
+		its(:description) {is_expected.to eq("Memento - новинка, вышло #{Date.today.cwyear - subject.year} лет назад")}
 	end
 
 	context 'initialize' do 

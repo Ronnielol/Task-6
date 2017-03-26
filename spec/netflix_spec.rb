@@ -30,8 +30,8 @@ describe Netflix do
 			expect{netflix.pay(25)}.to change{netflix.balance}.from(25).to(50)
 		end
 
-		it 'cant accept payments < 1$' do
-			expect{netflix.pay(-1)}.to raise_error.with_message("Пополнить счет можно минимум на 1$")
+		it 'cant accept payments =< 0$' do
+			expect{netflix.pay(-1)}.to raise_error.with_message("Нельзя пополнить счет на 0 или отрициательное значение.")
 		end
 	end
 
