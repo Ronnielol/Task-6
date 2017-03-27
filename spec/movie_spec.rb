@@ -2,49 +2,41 @@ require 'moviecollection'
 require 'movie'
 require 'csv'
 
-describe Movie do
 
-	context 'create' do
+describe 'create' do
 
-		let(:collection) {MovieCollection.new('lib/movies.txt')}
+	let(:base_data) {{"link" => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', "title" => 'Double Indemnity', "year" => '', "country" => 'USA', "date" => '1944-04-24', "genre" => 'Crime,Drama,Film-Noir', "length" => '107 min', "rating" => '8.4', "director" => 'Billy Wilder', "actors" => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson'}}
 
-		let(:ancient_movie_row) {{"link" => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', "title" => 'Double Indemnity', "year" => 1944, "country" => 'USA', "date" => '1944-04-24', "genre" => 'Crime,Drama,Film-Noir', "length" => '107 min', "rating" => '8.4', "director" => 'Billy Wilder', "actors" => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson'}}
+	let(:wrong_data){base_data.merge("year" => 2019)}
 
-		let(:classic_movie_row) {{"link" => 'http://imdb.com/title/tt0061722/?ref_=chttp_tt_248', "title" => 'The Graduate', "year" => 1967, "country" => 'USA', "date" => '1967-12-22', "genre" => 'Comedy,Drama,Romance', "length" => '106 min', "rating" => '8.0', "director" => 'Mike Nichols', "actors" => 'Dustin Hoffman,Anne Bancroft,Katharine Ross'}}
+	subject{Movie.create(data, 'collection')}
 
-		let(:modern_movie_row) {{"link" => 'http://imdb.com/title/tt0105236/?ref_=chttp_tt_78', "title" => 'Reservoir Dogs', "year" => 1992, "country" => 'USA', "date" => '1992-09-02', "genre" => 'Crime,Drama', "length" => '99 min', "rating" => '8.4', "director" => 'Quentin Tarantino', "actors" => 'Harvey Keitel,Tim Roth,Michael Madsen'}}
-
-		let(:new_movie_row) {{"link" => 'http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', "title" => 'Memento', "year" => 2000, "country" => 'USA', "date" => '2001-05-25', "genre" => 'Mystery,Thriller', "length" => '113 min', "rating" => '8.5', "director" => 'Christopher Nolan', "actors" => 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano'}}
-
-		let(:error_row) {{"link" => 'http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', "title" => 'Toy Story 4', "year" => 2019, "country" => 'USA', "date" => '2001-05-25', "genre" => 'Mystery,Thriller', "length" => '113 min', "rating" => '8.5', "director" => 'Christopher Nolan', "actors" => 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano'}}
-
-		it 'creates movie with class AncientMovie on year 1900..1944' do
-			# Double Indemnity|1944
-			expect(Movie.create(ancient_movie_row, collection)).to be_a(AncientMovie)
-		end
-
-		it 'creates movie with class ClassicMovie on year 1945..1967' do
-			# The Graduate|1967
-			expect(Movie.create(classic_movie_row, 'collection')).to be_a(ClassicMovie)
-		end
-
-		it 'creates movie with class ModernMovie on year 1968..1999' do
-			# Once Upon a Time in the West|1968
-			expect(Movie.create(modern_movie_row, 'collection')).to be_a(ModernMovie)
-		end
-
-		it 'creates movie with class NewMovie on year 2000..today' do
-			# Once Upon a Time in the West|1968
-			expect(Movie.create(new_movie_row, 'collection')).to be_a(NewMovie)
-		end
-
-		it 'throws an error when movie year is not in appropriate diapason' do
-			# Once Upon a Time in the West|1968
-			expect{Movie.create(error_row, 'collection')}.to raise_error.with_message("У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий.")
-		end
-
+	context 'ancient movie' do 
+		let(:data){base_data.merge("year" => 1940)}
+		it{is_expected.to be_a AncientMovie}
 	end
+
+	context 'classic movie' do 
+		let(:data){base_data.merge("year" => 1950)}
+		it{is_expected.to be_a ClassicMovie}
+	end
+
+	context 'modern movie' do 
+		let(:data){base_data.merge("year" => 1990)}
+		it{is_expected.to be_a ModernMovie}
+	end
+
+	context 'new movie' do 
+		let(:data){base_data.merge("year" => 2017)}
+		it{is_expected.to be_a NewMovie}
+	end
+
+	it 'throws an error when movie year is not in appropriate diapason' do
+		expect{Movie.create(wrong_data, 'collection')}.to raise_error.with_message("У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий.")
+	end
+
 end
+
 
 describe AncientMovie do
 

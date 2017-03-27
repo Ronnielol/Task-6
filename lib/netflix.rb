@@ -2,7 +2,7 @@ class Netflix < MovieCollection
 	attr_accessor :balance
 
 	def initialize(file)
-		super(file)
+		super
 		@balance = 0
 	end
 
@@ -23,7 +23,7 @@ class Netflix < MovieCollection
 
 	def show(options = {})
 		suitable_movies = self.filter(options)
-		if suitable_movies.length == 0
+		if suitable_movies.empty?
 			raise RuntimeError, 'Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.'
 		end
 		movie_to_show = pick_movie_by_weight(suitable_movies)

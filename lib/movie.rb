@@ -100,9 +100,13 @@ class NewMovie < Movie
 
 end
 
-PERIODS = {
-		ancient: { years: 1900..1944, movie_class: AncientMovie },
-		classic: { years: 1945..1967, movie_class: ClassicMovie },
-		modern: { years: 1968..1999, movie_class: ModernMovie },
-		new: { years: 2000..Date.today.cwyear, movie_class: NewMovie }
-	}
+class Movie
+	
+	PERIODS = {
+			ancient: { years: 1900..1944, movie_class: AncientMovie },
+			classic: { years: 1945..1967, movie_class: ClassicMovie },
+			modern: { years: 1968..1999, movie_class: ModernMovie },
+			new: { years: 2000..Date.today.cwyear, movie_class: NewMovie }
+		}
+
+end

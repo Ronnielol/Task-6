@@ -7,7 +7,7 @@ class Theatre < MovieCollection
 	}
 
 	def initialize(file)
-		super(file)
+		super
 	end
 
 	def show(time)
