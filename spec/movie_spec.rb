@@ -1,7 +1,8 @@
+require 'money'
+require 'modules/moneyhelper'
+require 'modules/task7'
 require 'moviecollection'
 require 'movie'
-require 'csv'
-
 
 describe 'create' do
 

@@ -49,7 +49,7 @@ class AncientMovie < Movie
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
 		super
-		@price = 1
+		@price = 1.to_money
 	end
 
 	def description
@@ -63,7 +63,7 @@ class ClassicMovie < Movie
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
 		super
-		@price = 1.5
+		@price = 1.5.to_money
 	end
 
 	def description
@@ -77,7 +77,7 @@ class ModernMovie < Movie
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
 		super
-		@price = 3
+		@price = 3.to_money
 	end
 
 	def description
@@ -91,7 +91,7 @@ class NewMovie < Movie
 	def initialize(link, title, year, country, date, 
 			 	   genre, length, rating, director, actors, collection)
 		super
-		@price = 5
+		@price = 5.to_money
 	end
 
 	def description

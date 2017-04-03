@@ -2,8 +2,14 @@ require 'csv'
 
 class MovieCollection
 
+	include Enumerable
+
 	HEADERS = %w{link title year country date 
 			 genre length rating director actors}
+
+	def each(&block)
+		@movies.each(&block)
+	end
 
 	def initialize(file)
 		@movies = CSV.foreach(file, col_sep: '|', headers: HEADERS, force_quotes: 'false', converters: [:numeric]).map{|row| Movie.create(row, self)}

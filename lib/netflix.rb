@@ -1,24 +1,24 @@
 class Netflix < MovieCollection
-	attr_accessor :balance
+
+	extend Task7::Cashbox
+
+	attr_accessor :user_balance
 
 	def initialize(file)
 		super
-		@balance = 0
+		@user_balance = 0.to_money
 	end
 
 	def pay(amount)
 		if amount <= 0 
 			raise StandardError, "Нельзя пополнить счет на 0 или отрициательное значение."
 		end
-		@balance += amount
+		@user_balance += amount.to_money
+		self.class.replenish_balance(amount)
 	end
 
 	def how_much?(title)
 		@movies.detect{|movie| movie.title == title}.price
-	end
-
-	def change_balance(movie_price)
-		@balance -= movie_price
 	end
 
 	def show(options = {})
@@ -27,10 +27,10 @@ class Netflix < MovieCollection
 			raise RuntimeError, 'Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.'
 		end
 		movie_to_show = pick_movie_by_weight(suitable_movies)
-		if @balance < movie_to_show.price
-			raise StandardError, "Не хватает средств. Сейчас на балансе #{self.balance}, а данный фильм стоит #{movie_to_show.price}." 
+		if @user_balance < movie_to_show.price.to_money
+			raise StandardError, "Не хватает средств. Сейчас на балансе #{user_balance}, а данный фильм стоит #{movie_to_show.price}." 
 		end
-		change_balance(movie_to_show.price)
+		@user_balance -= movie_to_show.price.to_money
 		puts "Now showing #{movie_to_show.title}"	
 		movie_to_show.description
 	end

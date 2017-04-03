@@ -1,3 +1,5 @@
+require 'money'
+require 'modules/task7'
 require 'moviecollection'
 require 'movie'
 require 'theatre'
@@ -55,6 +57,22 @@ describe Theatre do
 	context 'when?' do
 		it 'shows when the selected movie is playing' do
 			expect(theatre.when?('The Shawshank Redemption')).to eq("The Shawshank Redemption показывают с 18 до 23")
+		end
+	end
+
+	context 'cash' do 
+		it 'returns money balance in cashbox' do
+			expect(theatre.cash).to eq(0.to_money)
+		end
+	end
+
+	context 'buy_ticket' do
+		it 'returns message with bought movie information' do 
+			expect(theatre.buy_ticket('The Kid')).to eq('Вы купили билет на The Kid')
+		end
+
+		it 'sends money for ticket to cashbox' do
+			expect{theatre.buy_ticket('The Kid')}.to change{theatre.balance}.from(0.to_money).to(3.to_money) 
 		end
 	end
 end
