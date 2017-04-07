@@ -1,4 +1,5 @@
 class Movie
+
 	attr_reader :link, :title, :year, :country, :date, 
 			 	  :genre, :length, :rating, :director, :actors, :collection, :price, :period
 

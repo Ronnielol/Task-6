@@ -10,7 +10,6 @@ class Theatre < MovieCollection
 
 	def initialize(file)
 		super
-		initialize_balance
 	end
 
 	def show(time)

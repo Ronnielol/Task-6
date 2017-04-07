@@ -1,9 +1,11 @@
 require 'money'	
+require 'csv'
 require_relative 'modules/task7'
 require_relative 'moviecollection'
 require_relative 'movie'
 require_relative 'netflix'
 require_relative 'theatre'
+
 
 nf = Netflix.new('lib/movies.txt')
 

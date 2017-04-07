@@ -61,8 +61,15 @@ describe Theatre do
 	end
 
 	context 'cash' do 
-		it 'returns money balance in cashbox' do
+		it 'returns balance in cashbox' do
 			expect(theatre.cash).to eq(0.to_money)
+		end
+
+		it 'returns cashbox balance for every theatre instance' do
+			theatre2 = Theatre.new('lib/movies.txt')
+			theatre2.buy_ticket('The Kid')
+			expect(theatre.cash).to eq(0.to_money)
+			expect(theatre2.cash).to eq(3.to_money)
 		end
 	end
 

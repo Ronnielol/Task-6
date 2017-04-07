@@ -1,6 +1,6 @@
-require 'csv'
-
 class MovieCollection
+
+	using Task7::MoneyHelper
 
 	include Enumerable
 

@@ -40,8 +40,19 @@ describe Netflix do
 
 	context 'how_much?' do
 		it 'shows movie price' do
-			netflix = Netflix.new('lib/movies.txt')	
 			expect(netflix.how_much?('The Kid')).to eq(1.to_money)
 		end
 	end
+
+	context 'balance' do
+		it 'returns cashbox balance' do
+			expect(Netflix.balance).to eq(200.to_money)
+		end
+		it 'shares balance with class' do
+			nf2 = Netflix.new('lib/movies.txt')
+			nf2.pay(25)
+			expect(Netflix.balance).to eq(250.to_money)
+		end
+	end
+
 end

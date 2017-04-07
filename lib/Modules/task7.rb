@@ -1,42 +1,23 @@
-require_relative 'moneyhelper'
-require_relative 'cashbox'
-
 module Task7
 
 	module MoneyHelper
 
-		def to_money
-	  		Money.new(self*100, "USD")
+		refine Numeric do
+			def to_money
+			 	Money.new(self*100, "USD")
+			end
 		end
-
-	end
-
-	class Numeric
-
-		include MoneyHelper
 
 	end
 
 	module Cashbox
 
-		def initialize_balance
-			@cashbox_balance ||= 0.to_money
-		end
-
 		def replenish_balance(amount)
-			@cashbox_balance += amount.to_money
-		end
-
-		def reduce_balance(amount)
-			@cashbox_balance -= amount.to_money
+			@cashbox_balance = balance + amount.to_money
 		end
 
 		def balance
-			@cashbox_balance
-		end
-
-		def self.extended(base)
-			base.initialize_balance
+			@cashbox_balance ||= 0.to_money
 		end
 
 		def take(who)
@@ -50,4 +31,12 @@ module Task7
 	end
 
 end
+=begin
+	class  Numeric
+		def to_money
+			Money.new(self*100, "USD")
+			end
+		end
+	end
+=end
 
