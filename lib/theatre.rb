@@ -1,6 +1,6 @@
 class Theatre < MovieCollection
 
-	include Task7::Cashbox
+	include CashboxImplementation::Cashbox
 
 	SCHEDULE = {
 		morning: {time: (6..11), filters: {period: :ancient}, price: 3},

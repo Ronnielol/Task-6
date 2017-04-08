@@ -1,7 +1,6 @@
 require 'money'	
 require 'csv'
-require_relative 'modules/task7'
-using Task7::MoneyHelper
+require_relative 'modules/cashbox_implementation'
 require_relative 'moviecollection'
 require_relative 'movie'
 require_relative 'netflix'

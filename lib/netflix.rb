@@ -1,6 +1,9 @@
+require_relative 'modules/cashbox_implementation'
+using CashboxImplementation::MoneyHelper
+
 class Netflix < MovieCollection
 
-	extend Task7::Cashbox
+	extend CashboxImplementation::Cashbox
 
 	attr_accessor :user_balance
 

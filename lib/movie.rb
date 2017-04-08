@@ -1,3 +1,6 @@
+require_relative 'modules/cashbox_implementation'
+using CashboxImplementation::MoneyHelper
+
 class Movie
 
 	attr_reader :link, :title, :year, :country, :date, 

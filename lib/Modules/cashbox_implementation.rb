@@ -1,4 +1,4 @@
-module Task7
+module CashboxImplementation
 
 	module MoneyHelper
 

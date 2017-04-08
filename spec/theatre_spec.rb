@@ -1,5 +1,5 @@
 require 'money'
-require 'modules/task7'
+require 'modules/cashbox_implementation'
 require 'moviecollection'
 require 'movie'
 require 'theatre'

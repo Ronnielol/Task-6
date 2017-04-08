@@ -1,7 +1,5 @@
 class MovieCollection
 
-	using Task7::MoneyHelper
-
 	include Enumerable
 
 	HEADERS = %w{link title year country date 

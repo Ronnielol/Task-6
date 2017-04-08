@@ -1,7 +1,7 @@
 require 'money'
-require 'modules/task7'
+require 'modules/cashbox_implementation'
 
-describe Task7::Cashbox do
+describe CashboxImplementation::Cashbox do
 
 	class EDummyClass
 	end
@@ -10,8 +10,8 @@ describe Task7::Cashbox do
 	end
 
 	before(:each) do
-		@extended_dummy_class = EDummyClass.extend(Task7::Cashbox)
-		@including_dummy_class = IDummyClass.include(Task7::Cashbox).new
+		@extended_dummy_class = EDummyClass.extend(CashboxImplementation::Cashbox)
+		@including_dummy_class = IDummyClass.include(CashboxImplementation::Cashbox).new
 	end
 
 	context 'replenish balance' do 
