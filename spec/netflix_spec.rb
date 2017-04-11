@@ -1,12 +1,11 @@
 require 'money'
-require 'modules/cashbox_implementation'
-require 'moviecollection'
-require 'movie'
-require 'netflix'
+require 'cinema'
 
-describe Netflix do
+describe Cinema::Examples::Netflix do
 
-	let(:netflix) {Netflix.new('lib/movies.txt')}
+	using Cinema::CashboxImplementation::MoneyHelper
+
+	let(:netflix) {Cinema::Examples::Netflix.new('lib/movies.txt')}
 
 	before(:each) do 
 		netflix.pay(25)
@@ -45,12 +44,12 @@ describe Netflix do
 
 	context 'balance' do
 		it 'returns cashbox balance' do
-			expect(Netflix.balance).to eq(200.to_money)
+			expect(Cinema::Examples::Netflix.balance).to eq(200.to_money)
 		end
 		it 'shares balance with class' do
-			nf2 = Netflix.new('lib/movies.txt')
+			nf2 = Cinema::Examples::Netflix.new('lib/movies.txt')
 			nf2.pay(25)
-			expect(Netflix.balance).to eq(250.to_money)
+			expect(Cinema::Examples::Netflix.balance).to eq(250.to_money)
 		end
 	end
 

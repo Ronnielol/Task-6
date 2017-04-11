@@ -1,7 +1,9 @@
 require 'money'
-require 'modules/cashbox_implementation'
+require 'cinema'
 
-describe CashboxImplementation::Cashbox do
+describe Cinema::CashboxImplementation::Cashbox do
+
+	using Cinema::CashboxImplementation::MoneyHelper
 
 	class EDummyClass
 	end
@@ -10,8 +12,8 @@ describe CashboxImplementation::Cashbox do
 	end
 
 	before(:each) do
-		@extended_dummy_class = EDummyClass.extend(CashboxImplementation::Cashbox)
-		@including_dummy_class = IDummyClass.include(CashboxImplementation::Cashbox).new
+		@extended_dummy_class = EDummyClass.extend(Cinema::CashboxImplementation::Cashbox)
+		@including_dummy_class = IDummyClass.include(Cinema::CashboxImplementation::Cashbox).new
 	end
 
 	context 'replenish balance' do 

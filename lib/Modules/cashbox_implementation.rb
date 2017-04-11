@@ -12,6 +12,8 @@ module CashboxImplementation
 
 	module Cashbox
 
+		using CashboxImplementation::MoneyHelper
+
 		def replenish_balance(amount)
 			@cashbox_balance = balance + amount.to_money
 		end
@@ -31,12 +33,13 @@ module CashboxImplementation
 	end
 
 end
+
 =begin
-	class  Numeric
-		def to_money
-			Money.new(self*100, "USD")
-			end
-		end
+class  Numeric
+	def to_money
+		Money.new(self*100, "USD")
 	end
+end
 =end
+
 

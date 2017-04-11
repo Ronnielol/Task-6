@@ -1,13 +1,8 @@
 require 'money'	
 require 'csv'
-require_relative 'modules/cashbox_implementation'
-require_relative 'moviecollection'
-require_relative 'movie'
-require_relative 'netflix'
-require_relative 'theatre'
+require_relative 'cinema'
 
-
-nf = Netflix.new('lib/movies.txt')
+nf = Cinema::Examples::Netflix.new('lib/movies.txt')
 
 begin
 	nf.pay(25)
@@ -21,9 +16,9 @@ begin
 		puts "<#{e.class}: #{e.message}>"
 end
 #nf.how_much?('The Kid')
-th = Theatre.new('lib/movies.txt')
+th = Cinema::Examples::Theatre.new('lib/movies.txt')
 th.buy_ticket('The Kid')
-th.cash
+p th.fetch_movie(:morning)
 begin
 	th.take('Bank')
 rescue RuntimeError => e
