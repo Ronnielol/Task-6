@@ -87,7 +87,7 @@ module Cinema
 					
 				@link, @title, @year, @country, @genre, @length, @rating, @director, @actors, @collection = link, title, year, country, 
 					 	   genre.split(","), length, rating, director, actors.split(","), collection
-				@period = self.class.to_s.gsub("Movie", "").downcase.to_sym
+				@period = self.class.to_s.gsub("Cinema::Movies::", "").gsub("Movie", "").downcase.to_sym
 			end
 
 			def self.create(row, collection)
@@ -249,7 +249,7 @@ module Cinema
 			include Cinema::CashboxImplementation::Cashbox
 
 			SCHEDULE = {
-				morning: {time: (6..11), filters: {period: :'cinema::s::ancient'}, price: 3},
+				morning: {time: (6..11), filters: {period: :ancient}, price: 3},
 				afternoon: {time: (12..17), filters: {genre:['Comedy', 'Adventure']}, price: 5},
 				evening: {time: (18..23), filters: {genre:['Drama', 'Horror']}, price: 10}
 			}
