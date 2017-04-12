@@ -2,9 +2,9 @@ module Cinema
 
 	module Examples
 
-		class Theatre < Cinema::Collections::MovieCollection
+		class Theatre < Cinema::MovieCollection
 
-			include CashboxImplementation::Cashbox
+			include Cinema::Cashbox
 
 			SCHEDULE = {
 				morning: {time: (6..11), filters: {period: :ancient}, price: 3},

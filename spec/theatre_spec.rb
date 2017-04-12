@@ -1,22 +1,23 @@
 require 'money'
 require 'cinema'
+require 'cinema/money_helper'
 
 describe Cinema::Examples::Theatre do
 
-	using Cinema::CashboxImplementation::MoneyHelper
+	using MoneyHelper
 
 	let(:theatre) {Cinema::Examples::Theatre.new('lib/movies.txt')}
 
-	let(:morning_movie) {Cinema::Movies::AncientMovie.new('http://imdb.com/title/tt0034583/?ref_=chttp_tt_32', 'Casablanca', '1942', 'USA', '1943-01-23', 
+	let(:morning_movie) {Cinema::AncientMovie.new('http://imdb.com/title/tt0034583/?ref_=chttp_tt_32', 'Casablanca', '1942', 'USA', '1943-01-23', 
 			 	   'Drama,Romance,War', '102 min', '8.6', 'Michael Curtiz', 'Humphrey Bogart,Ingrid Bergman,Paul Henreid', collection)}
 
-	let(:afternoon_movie) {Cinema::Movies::ClassicMovie.new('http://imdb.com/title/tt0061722/?ref_=chttp_tt_248', 'The Graduate', '1967', 'USA', '1967-12-22', 
+	let(:afternoon_movie) {Cinema::ClassicMovie.new('http://imdb.com/title/tt0061722/?ref_=chttp_tt_248', 'The Graduate', '1967', 'USA', '1967-12-22', 
 			 	   'Comedy,Drama,Romance', '106 min', '8.0', 'Mike Nichols', 'Dustin Hoffman,Anne Bancroft,Katharine Ross', collection)}
 
-	let(:evening_movie) {Cinema::Movies::AncientMovie.new('http://imdb.com/title/tt0034583/?ref_=chttp_tt_32', 'Casablanca', '1942', 'USA', '1943-01-23', 
+	let(:evening_movie) {Cinema::AncientMovie.new('http://imdb.com/title/tt0034583/?ref_=chttp_tt_32', 'Casablanca', '1942', 'USA', '1943-01-23', 
 			 	   'Drama,Romance,War', '102 min', '8.6', 'Michael Curtiz', 'Humphrey Bogart,Ingrid Bergman,Paul Henreid', collection)}
 
-	let(:collection) {Cinema::Collections::MovieCollection.new('lib/movies.txt')}
+	let(:collection) {Cinema::MovieCollection.new('lib/movies.txt')}
 
 	context 'show' do
 		it 'shows ancient movies on mornings' do
@@ -41,7 +42,7 @@ describe Cinema::Examples::Theatre do
 
 	context 'fetch_movie' do
 		it 'fetches right movie for morning' do
-			expect(theatre.send(:fetch_movie, :morning)).to be_a(Cinema::Movies::AncientMovie)
+			expect(theatre.send(:fetch_movie, :morning)).to be_a(Cinema::AncientMovie)
 		end
 
 		it 'fetches right movie for afternoon' do

@@ -2,11 +2,11 @@ module Cinema
 
 	module Examples
 
-		class Netflix < Cinema::Collections::MovieCollection
+		class Netflix < Cinema::MovieCollection
 
-			using Cinema::CashboxImplementation::MoneyHelper
+			using MoneyHelper
 
-			extend CashboxImplementation::Cashbox
+			extend Cinema::Cashbox
 
 			attr_accessor :user_balance
 

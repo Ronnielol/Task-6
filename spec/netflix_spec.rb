@@ -1,9 +1,10 @@
 require 'money'
 require 'cinema'
+require 'cinema/money_helper'
 
 describe Cinema::Examples::Netflix do
 
-	using Cinema::CashboxImplementation::MoneyHelper
+	using MoneyHelper
 
 	let(:netflix) {Cinema::Examples::Netflix.new('lib/movies.txt')}
 
