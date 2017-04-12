@@ -1,6 +1,5 @@
 require 'money'
 require 'cinema'
-require 'csv'
 
 describe Cinema::Movies do 
 

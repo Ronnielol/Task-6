@@ -1,5 +1,6 @@
 require 'money'
 require 'cinema'
+require 'csv'
 
 describe Cinema::CashboxImplementation::Cashbox do
 

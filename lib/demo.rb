@@ -18,7 +18,6 @@ end
 #nf.how_much?('The Kid')
 th = Cinema::Examples::Theatre.new('lib/movies.txt')
 th.buy_ticket('The Kid')
-p th.fetch_movie(:morning)
 begin
 	th.take('Bank')
 rescue RuntimeError => e
