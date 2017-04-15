@@ -6,7 +6,7 @@ describe Cinema::Examples::Theatre do
 
 	using MoneyHelper
 
-	let(:theatre) {Cinema::Examples::Theatre.new('lib/movies.txt')}
+	let(:theatre) {described_class.new('lib/movies.txt')}
 
 	let(:morning_movie) {Cinema::AncientMovie.new('http://imdb.com/title/tt0034583/?ref_=chttp_tt_32', 'Casablanca', '1942', 'USA', '1943-01-23', 
 			 	   'Drama,Romance,War', '102 min', '8.6', 'Michael Curtiz', 'Humphrey Bogart,Ingrid Bergman,Paul Henreid', collection)}
@@ -66,7 +66,7 @@ describe Cinema::Examples::Theatre do
 		end
 
 		it 'returns cashbox balance for every theatre instance' do
-			theatre2 = Cinema::Examples::Theatre.new('lib/movies.txt')
+			theatre2 = described_class.new('lib/movies.txt')
 			theatre2.buy_ticket('The Kid')
 			expect(theatre.cash).to eq(0.to_money)
 			expect(theatre2.cash).to eq(3.to_money)

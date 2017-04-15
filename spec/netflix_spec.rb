@@ -6,7 +6,7 @@ describe Cinema::Examples::Netflix do
 
 	using MoneyHelper
 
-	let(:netflix) {Cinema::Examples::Netflix.new('lib/movies.txt')}
+	let(:netflix) {described_class.new('lib/movies.txt')}
 
 	before(:each) do 
 		netflix.pay(25)
@@ -45,12 +45,12 @@ describe Cinema::Examples::Netflix do
 
 	context 'balance' do
 		it 'returns cashbox balance' do
-			expect(Cinema::Examples::Netflix.balance).to eq(200.to_money)
+			expect(described_class.balance).to eq(200.to_money)
 		end
 		it 'shares balance with class' do
-			nf2 = Cinema::Examples::Netflix.new('lib/movies.txt')
+			nf2 = described_class.new('lib/movies.txt')
 			nf2.pay(25)
-			expect(Cinema::Examples::Netflix.balance).to eq(250.to_money)
+			expect(described_class.balance).to eq(250.to_money)
 		end
 	end
 
