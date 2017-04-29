@@ -1,3 +1,5 @@
+require 'money'
+require 'csv'
 require_relative './cinema/money_helper'
 require_relative './cinema/cashbox'
 require_relative './cinema/movie'

@@ -1,4 +1,5 @@
 module Cinema
+  # Gathers movies info from file and creates collection
   class MovieCollection
     include Enumerable
 
@@ -10,7 +11,10 @@ module Cinema
     end
 
     def initialize(file)
-      @movies = CSV.foreach(file, col_sep: '|', headers: HEADERS, force_quotes: 'false', converters: [:numeric]).map { |row| Cinema::Movie.create(row, self) }
+      @movies = CSV.foreach(
+        file, col_sep: '|', headers: HEADERS,
+              force_quotes: 'false', converters: [:numeric]
+      ).map { |row| Cinema::Movie.create(row, self) }
     end
 
     def stats(arg)

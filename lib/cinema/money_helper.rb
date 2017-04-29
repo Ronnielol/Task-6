@@ -1,3 +1,4 @@
+# Numbers to money convertion
 module MoneyHelper
   refine Numeric do
     def to_money

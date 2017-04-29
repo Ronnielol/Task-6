@@ -28,6 +28,25 @@ describe Cinema::Examples::Netflix do
     it 'accepts filter blocks' do
       expect { netflix.show { |movie| movie.title.include?('The Lord of the Rings: The Return of the King') } }.to output("Now showing The Lord of the Rings: The Return of the King\n").to_stdout
     end
+
+    it 'shows movie if cutsom filter enabled' do
+      netflix.define_filter(:foo) { |movie| movie.title.include?('Lord of the Rings: The Return of the King') }
+      expect { netflix.show(foo: true) }.to output("Now showing The Lord of the Rings: The Return of the King\n").to_stdout
+    end
+
+    it 'raises error if custom filter disabled' do
+      netflix.define_filter(:foo) { |movie| movie.title.include?('Lord of the Rings: The Return of the King') }
+      expect { netflix.show(foo: false) }.to raise_error.with_message('Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.')
+    end
+
+    it 'raises error if filter does not exist' do
+      expect {  netflix.show(foobar: true)}.to raise_error.with_message("Фильтр foobar не найден. Проверьте правильность ввода.")
+    end
+
+    it 'shows movie if custom filter has parameter' do
+      netflix.define_filter(:bar) { |movie, year| movie.year > year && movie.genre.include?('Action') }
+      expect { netflix.show(bar: 2014) }.to output("Now showing Mad Max: Fury Road\n").to_stdout
+    end
   end
 
   context 'pay' do
@@ -57,16 +76,24 @@ describe Cinema::Examples::Netflix do
     end
   end
 
-  context 'define_filter' do
-    xit 'saves custom filter' do
-    end
-  end
-
   context 'custom_filter?' do
     it 'checks if filter is custom' do
       netflix.define_filter(:fav_fantasy) { |movie| movie.title.include?('Lord of the Rings') }
       expect(netflix.send(:custom_filter?, fav_fantasy: true)).to eq(true)
       expect(netflix.send(:custom_filter?, actors: 'Arnold')).to eq(false)
+    end
+  end
+
+  context 'define_filter' do
+    it 'saves custom filter as a proc' do
+      netflix.define_filter(:fav_fantasy) { |movie| movie.title.include?('Lord of the Rings') }
+      expect(netflix.custom_filters[:fav_fantasy]).to be_a(Proc)
+    end
+
+    it 'defines new custom filter based on existing filter' do
+      netflix.define_filter(:bar) { |movie, year| movie.year > year && movie.genre.include?('Action') }
+      netflix.define_filter(:newest_sci_fi, from: :bar, arg: 2014)
+      expect { netflix.show(newest_sci_fi: true) }.to output("Now showing Mad Max: Fury Road\n").to_stdout
     end
   end
 end

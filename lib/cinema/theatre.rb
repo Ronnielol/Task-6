@@ -1,12 +1,25 @@
 module Cinema
   module Examples
+    # Movie Theatre Example Class
     class Theatre < Cinema::MovieCollection
       include Cinema::Cashbox
 
       SCHEDULE = {
-        morning: { time: (6..11), filters: { period: :ancient }, price: 3 },
-        afternoon: { time: (12..17), filters: { genre: %w[Comedy Adventure] }, price: 5 },
-        evening: { time: (18..23), filters: { genre: %w[Drama Horror] }, price: 10 }
+        morning: {
+          time: (6..11),
+          filters: { period: :ancient },
+          price: 3
+        },
+        afternoon: {
+          time: (12..17),
+          filters: { genre: %w[Comedy Adventure] },
+          price: 5
+        },
+        evening: {
+          time: (18..23),
+          filters: { genre: %w[Drama Horror] },
+          price: 10
+        }
       }.freeze
 
       def initialize(file)
@@ -24,8 +37,12 @@ module Cinema
       def when?(movie_title)
         selected_movie = filter(title: movie_title)[0]
         movie_is_presented?(selected_movie)
-        daytime, = SCHEDULE.detect { |_name, options| selected_movie.matches?(options[:filters]) }
+        daytime, = SCHEDULE.detect do |_name, options|
+          selected_movie.matches?(options[:filters])
+        end
+        # rubocop:disable LineLength
         "#{selected_movie.title} показывают с #{SCHEDULE[daytime][:time].first} до #{SCHEDULE[daytime][:time].last}"
+        # rubocop:enable LineLength
       end
 
       def cash
@@ -35,7 +52,9 @@ module Cinema
       def buy_ticket(movie_title)
         selected_movie = filter(title: movie_title)[0]
         movie_is_presented?(selected_movie)
-        _, options = SCHEDULE.detect { |_name, options| selected_movie.matches?(options[:filters]) }
+        _, options = SCHEDULE.detect do |_name, options|
+          selected_movie.matches?(options[:filters])
+        end
         movie_price = options[:price]
         replenish_balance(movie_price)
         "Вы купили билет на #{selected_movie.title}"
@@ -45,19 +64,23 @@ module Cinema
 
       def fetch_movie(period)
         pick_movie_by_weight(filter(SCHEDULE[period][:filters]))
-        end
+      end
 
       def check_time(time)
-        unless SCHEDULE.map { |_k, v| v[:time].to_a }.flatten.include?(time.to_i)
+        unless SCHEDULE.map { |_k, v| v[:time].to_a }
+                       .flatten
+                       .include?(time.to_i)
+          # rubocop:disable LineLength
           raise "Наш кинотеатр работает с #{SCHEDULE[:morning][:time].first} до #{SCHEDULE[:evening][:time].last}. Вы выбрали время #{time}."
-          end
+          # rubocop:enable LineLength
         end
+      end
 
       def movie_is_presented?(movie)
-        if movie.nil?
-          raise 'Не найдено подходящих фильмов. Проверьте правильность ввода.'
-          end
-        end
+        # rubocop:disable LineLength
+        raise 'Не найдено подходящих фильмов. Проверьте правильность ввода.' if movie.nil?
+        # rubocop:enable LineLength
+      end
     end
   end
 end
