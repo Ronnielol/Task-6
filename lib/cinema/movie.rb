@@ -5,31 +5,17 @@ module Cinema
                 :genre, :length, :rating, :director,
                 :actors, :collection, :price, :period
 
-    # rubocop:disable MethodLength
-    # rubocop:disable ParameterLists
-    # rubocop:disable AbcSize
-    def initialize(link, title, year, country,
+    def initialize(link, title, year, country, # rubocop:disable ParameterLists
                    date, genre, length, rating,
                    director, actors, collection)
-      @date = Date.parse(date) if date.to_s.length > 7
-      @link = link
-      @title = title
-      @year = year
-      @country = country
-      @genre = genre.split(',')
-      @length = length
-      @rating = rating
-      @director = director
-      @actors = actors.split(',')
-      @collection = collection
+      assign_parameters(link, title, year, country,
+                        date, genre, length, rating,
+                        director, actors, collection)
       @period = self.class
                     .name.sub(/^Cinema::(.+)Movie$/, '\1')
                     .downcase
                     .to_sym
     end
-    # rubocop:enable MethodLength
-    # rubocop:enable ParameterLists
-    # rubocop:enable AbcSize
 
     def self.create(row, collection)
       period_settings = find_period_setting(row)
@@ -90,6 +76,17 @@ module Cinema
         filter_value === value
       end
       # rubocop:enable CaseEquality
+    end
+
+    def assign_parameters(link, title, year, # rubocop:disable ParameterLists
+                          country, date, genre, length, rating,
+                          director, actors, collection)
+      @date = Date.parse(date) if date.to_s.length > 7
+      parameters = [link, title, year, country, genre.split(','),
+                    length, rating, director, actors.split(','),
+                    collection]
+      @link, @title, @year, @country, @genre, @length,
+      @rating, @director, @actors, @collection = parameters
     end
   end
 

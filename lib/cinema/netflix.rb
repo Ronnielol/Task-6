@@ -38,16 +38,11 @@ module Cinema
         movie_to_show.description
       end
 
+      # rubocop:disable LineLength
       def define_filter(filter_name, from: nil, arg: nil, &block)
-        if !from.nil?
-          # Define new filter based on already defined one
-          define_filter_from_filter(
-            filter_name, @custom_filters[from], arg
-          )
-        else
-          @custom_filters[filter_name.to_sym] = block
-        end
+        @custom_filters[filter_name.to_sym] = from ? derive_filter(filter_name, from, arg) : block
       end
+      # rubocop:enable LineLength
 
       private
 
@@ -64,7 +59,7 @@ module Cinema
       def find_suitable_movies(options, &block)
         # Finds movies depending on filter or block
         if block_given?
-          suitable_movies = filter_with_block(proc(&block))
+          suitable_movies = filter_with_block(block)
         else
           check_filter_exists(options)
           suitable_movies = custom_filter(options, &block) || filter(options)
@@ -82,10 +77,11 @@ module Cinema
       end
 
       def custom_filter(given_filter)
-        known_filter = @custom_filters[given_filter.keys[0]]
+        filter_name, filter_value = given_filter.first
+        known_filter = @custom_filters[filter_name]
         return nil unless known_filter
         if arguments?(given_filter)
-          filter_with_block(known_filter, given_filter.values[0])
+          filter_with_block(known_filter, filter_value)
         else
           filter_with_block(known_filter)
         end
@@ -109,11 +105,11 @@ module Cinema
         end
       end
 
-      def define_filter_from_filter(new_filter_name, custom_filter, parameter)
-        new_filter = proc do |movie, _arg|
+      def derive_filter(_new_filter_name, defined_filter, parameter)
+        custom_filter = @custom_filters[defined_filter]
+        proc do |movie, _arg|
           custom_filter.call(movie, parameter)
         end
-        @custom_filters[new_filter_name.to_sym] = new_filter
       end
 
       def custom_filter?(filter)
