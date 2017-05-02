@@ -40,9 +40,9 @@ module Cinema
         daytime, = SCHEDULE.detect do |_name, options|
           selected_movie.matches?(options[:filters])
         end
-        # rubocop:disable LineLength
-        "#{selected_movie.title} показывают с #{SCHEDULE[daytime][:time].first} до #{SCHEDULE[daytime][:time].last}"
-        # rubocop:enable LineLength
+        "#{selected_movie.title} показывают с"\
+        " #{SCHEDULE[daytime][:time].first} до"\
+        " #{SCHEDULE[daytime][:time].last}"
       end
 
       def cash
@@ -70,16 +70,16 @@ module Cinema
         unless SCHEDULE.map { |_k, v| v[:time].to_a }
                        .flatten
                        .include?(time.to_i)
-          # rubocop:disable LineLength
-          raise "Наш кинотеатр работает с #{SCHEDULE[:morning][:time].first} до #{SCHEDULE[:evening][:time].last}. Вы выбрали время #{time}."
-          # rubocop:enable LineLength
+          raise 'Наш кинотеатр работает с'\
+          " #{SCHEDULE[:morning][:time].first} до"\
+          " #{SCHEDULE[:evening][:time].last}. Вы выбрали время #{time}."
         end
       end
 
       def movie_is_presented?(movie)
-        # rubocop:disable LineLength
-        raise 'Не найдено подходящих фильмов. Проверьте правильность ввода.' if movie.nil?
-        # rubocop:enable LineLength
+        return unless movie.nil?
+        raise 'Не найдено подходящих фильмов.'\
+          'Проверьте правильность ввода.'
       end
     end
   end

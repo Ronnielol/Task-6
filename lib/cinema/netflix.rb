@@ -16,9 +16,8 @@ module Cinema
 
       def pay(amount)
         if amount <= 0
-          # rubocop:disable LineLength
-          raise StandardError, 'Нельзя пополнить счет на 0 или отрициательное значение.'
-          # rubocop:enable LineLength
+          raise StandardError, 'Нельзя пополнить счет на 0'\
+          ' или отрициательное значение.'
         end
         @user_balance += amount.to_money
         self.class.replenish_balance(amount)
@@ -46,15 +45,12 @@ module Cinema
 
       private
 
-      # rubocop:disable GuardClause
       def check_balance(movie)
-        if @user_balance < movie.price.to_money
-          raise StandardError, 'Не хватает средств.'\
-          " Сейчас на балансе #{user_balance},"\
-          " а данный фильм стоит #{movie.price}."
-        end
+        return unless @user_balance < movie.price.to_money
+        raise StandardError, 'Не хватает средств.'\
+        " Сейчас на балансе #{user_balance},"\
+        " а данный фильм стоит #{movie.price}."
       end
-      # rubocop:enable GuardClause
 
       def find_suitable_movies(options, &block)
         # Finds movies depending on filter or block
@@ -64,12 +60,14 @@ module Cinema
           check_filter_exists(options)
           suitable_movies = custom_filter(options, &block) || filter(options)
         end
-        if suitable_movies.empty?
-          # rubocop:disable LineLength
-          raise 'Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.'
-          # rubocop:enable LineLength
-        end
+        got_movies?(suitable_movies)
         suitable_movies
+      end
+
+      def got_movies?(suitable_movies)
+        return unless suitable_movies.empty?
+        raise 'Не найдено подходящих по фильтрам фильмов.'\
+          ' Проверьте правильность ввода.'
       end
 
       def arguments?(filter)
@@ -90,9 +88,10 @@ module Cinema
       def check_filter_exists(filter)
         # Raises error if filter does not exist in custom filters hash
         # or movie parameters
-        # rubocop:disable LineLength
-        raise StandardError, "Фильтр #{filter.keys[0]} не найден. Проверьте правильность ввода." if !custom_filter?(filter) && !HEADERS.include?(filter.keys[0].to_s)
-        # rubocop:enable LineLength
+        filter_name = filter.keys[0].to_s
+        return unless !custom_filter?(filter) && !HEADERS.include?(filter_name)
+        raise StandardError, "Фильтр #{filter.keys[0]} не найден."\
+          ' Проверьте правильность ввода.'
       end
 
       def filter_with_block(proc, *params)

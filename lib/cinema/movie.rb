@@ -31,24 +31,21 @@ module Cinema
 
     def self.find_period_setting(movie_parameters)
       _, period_settings = PERIODS.detect do |_period, value|
-        # rubocop:disable CaseEquality
         value[:years] === movie_parameters['year']
-        # rubocop:enable CaseEquality
       end
       period_settings
     end
 
     def self.check_year(movie_parameters)
-      # rubocop:disable LineLength
-      raise 'У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий.' if movie_parameters.nil?
-      # rubocop:enable LineLength
+      return unless movie_parameters.nil?
+      raise 'У фильма неподходящий год.'\
+      ' В базе могут быть только фильмы, снятые с 1900 года по настоящий.'
     end
 
     def genre?(genre)
       unless @collection.genre_exists?(genre)
-        # rubocop:disable LineLength
-        raise ArgumentError, 'Аргумент задан с ошибкой, либо такого жанра не существует.'
-        # rubocop:enable LineLength
+        raise ArgumentError, 'Аргумент задан с ошибкой,'\
+        ' либо такого жанра не существует.'
       end
       @genre.include? genre
     end
@@ -69,13 +66,11 @@ module Cinema
     end
 
     def value_match?(value, filter_value)
-      # rubocop:disable CaseEquality
       if filter_value.is_a?(Array)
         filter_value.any? { |fv| fv === value }
       else
         filter_value === value
       end
-      # rubocop:enable CaseEquality
     end
 
     def assign_parameters(link, title, year, # rubocop:disable ParameterLists
@@ -99,7 +94,7 @@ module Cinema
       super
       @price = 1.to_money
     end
-    # rubocop:enable ParameterList
+    # rubocop:enable ParameterLists
 
     def description
       "#{title} - старый фильм #{year}"
@@ -109,6 +104,7 @@ module Cinema
   # Movie gets this class if movie year 1945..1967
   class ClassicMovie < Movie
     using MoneyHelper
+    # rubocop:disable ParameterLists
     def initialize(link, title, year, country, date,
                    genre, length, rating, director, actors, collection)
       super
@@ -117,9 +113,9 @@ module Cinema
     # rubocop:enable ParameterLists
 
     def description
-      # rubocop:disable LineLength
-      "#{title} - классический фильм #{director} (ещё #{collection.stats(:director)[director] - 1} его фильмов в списке)"
-      # rubocop:enable LineLength
+      "#{title} - классический фильм #{director}"\
+      " (ещё #{collection.stats(:director)[director] - 1}"\
+      ' его фильмов в списке)'
     end
   end
 
