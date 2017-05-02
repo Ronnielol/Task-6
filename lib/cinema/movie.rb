@@ -7,6 +7,7 @@ module Cinema
 
     # rubocop:disable MethodLength
     # rubocop:disable ParameterLists
+    # rubocop:disable AbcSize
     def initialize(link, title, year, country,
                    date, genre, length, rating,
                    director, actors, collection)
@@ -28,6 +29,7 @@ module Cinema
     end
     # rubocop:enable MethodLength
     # rubocop:enable ParameterLists
+    # rubocop:enable AbcSize
 
     def self.create(row, collection)
       period_settings = find_period_setting(row)

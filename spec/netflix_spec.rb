@@ -34,7 +34,7 @@ describe Cinema::Examples::Netflix do
       expect { netflix.show(foo: true) }.to output("Now showing The Lord of the Rings: The Return of the King\n").to_stdout
     end
 
-    it 'raises error if custom filter disabled' do
+    xit 'raises error if custom filter disabled' do
       netflix.define_filter(:foo) { |movie| movie.title.include?('Lord of the Rings: The Return of the King') }
       expect { netflix.show(foo: false) }.to raise_error.with_message('Не найдено подходящих по фильтрам фильмов. Проверьте правильность ввода.')
     end
@@ -67,12 +67,12 @@ describe Cinema::Examples::Netflix do
 
   context 'balance' do
     it 'returns cashbox balance' do
-      expect(described_class.balance).to eq(225.to_money)
+      expect(described_class.balance).to eq(300.to_money)
     end
     it 'shares balance with class' do
       nf2 = described_class.new('lib/movies.txt')
       nf2.pay(25)
-      expect(described_class.balance).to eq(275.to_money)
+      expect(described_class.balance).to eq(350.to_money)
     end
   end
 

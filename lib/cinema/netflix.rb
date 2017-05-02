@@ -38,36 +38,35 @@ module Cinema
         movie_to_show.description
       end
 
-      # rubocop:disable MethodLength
-      def define_filter(filter_name, **redefine_filter, &block)
-        if !redefine_filter.empty?
+      def define_filter(filter_name, from: nil, arg: nil, &block)
+        if !from.nil?
           # Define new filter based on already defined one
           define_filter_from_filter(
-            filter_name,
-            @custom_filters[redefine_filter[:from]],
-            redefine_filter[:arg]
+            filter_name, @custom_filters[from], arg
           )
         else
-          @custom_filters = @custom_filters.merge(
-            filter_name.to_sym => proc(&block)
-          )
+          @custom_filters[filter_name.to_sym] = block
         end
       end
-      # rubcopo:enable MethodLength
 
       private
 
+      # rubocop:disable GuardClause
       def check_balance(movie)
-        # rubocop:disable LineLength
-        raise StandardError, "Не хватает средств. Сейчас на балансе #{user_balance}, а данный фильм стоит #{movie.price}." if @user_balance < movie.price.to_money
-        # rubocop:enable LineLength
+        if @user_balance < movie.price.to_money
+          raise StandardError, 'Не хватает средств.'\
+          " Сейчас на балансе #{user_balance},"\
+          " а данный фильм стоит #{movie.price}."
+        end
       end
+      # rubocop:enable GuardClause
 
       def find_suitable_movies(options, &block)
         # Finds movies depending on filter or block
         if block_given?
           suitable_movies = filter_with_block(proc(&block))
         else
+          check_filter_exists(options)
           suitable_movies = custom_filter(options, &block) || filter(options)
         end
         if suitable_movies.empty?
@@ -78,34 +77,26 @@ module Cinema
         suitable_movies
       end
 
-      # rubcopo:disable MethodLength
+      def arguments?(filter)
+        return true unless filter.values[0].is_a?(TrueClass)
+      end
+
       def custom_filter(given_filter)
-        check_filter_exists(given_filter)
-        if custom_filter?(given_filter)
-          case custom_filter_enabled?(given_filter)
-          when true
-            filter_with_block(@custom_filters[given_filter.keys[0]])
-          when false
-            []
-          else
-            # Filter with parameter if user set an additional one
-            filter_with_block(
-              @custom_filters[given_filter.keys[0]],
-              given_filter.values[0]
-            )
-          end
+        known_filter = @custom_filters[given_filter.keys[0]]
+        return nil unless known_filter
+        if arguments?(given_filter)
+          filter_with_block(known_filter, given_filter.values[0])
+        else
+          filter_with_block(known_filter)
         end
       end
-      # rubcopo:enable MethodLength
 
       def check_filter_exists(filter)
         # Raises error if filter does not exist in custom filters hash
         # or movie parameters
-        if !custom_filter?(filter) && !HEADERS.include?(filter.keys[0].to_s)
-          # rubocop:disable LineLength
-          raise StandardError, "Фильтр #{filter.keys[0]} не найден. Проверьте правильность ввода."
-          # rubocop:enable LineLength
-        end
+        # rubocop:disable LineLength
+        raise StandardError, "Фильтр #{filter.keys[0]} не найден. Проверьте правильность ввода." if !custom_filter?(filter) && !HEADERS.include?(filter.keys[0].to_s)
+        # rubocop:enable LineLength
       end
 
       def filter_with_block(proc, *params)
@@ -122,9 +113,7 @@ module Cinema
         new_filter = proc do |movie, _arg|
           custom_filter.call(movie, parameter)
         end
-        @custom_filters = @custom_filters.merge(
-          new_filter_name.to_sym => new_filter
-        )
+        @custom_filters[new_filter_name.to_sym] = new_filter
       end
 
       def custom_filter?(filter)
