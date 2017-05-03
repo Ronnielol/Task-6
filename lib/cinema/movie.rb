@@ -8,13 +8,25 @@ module Cinema
     def initialize(link, title, year, country, # rubocop:disable ParameterLists
                    date, genre, length, rating,
                    director, actors, collection)
-      assign_parameters(link, title, year, country,
-                        date, genre, length, rating,
-                        director, actors, collection)
-      @period = self.class
-                    .name.sub(/^Cinema::(.+)Movie$/, '\1')
-                    .downcase
-                    .to_sym
+      @date, @link, @title, @year, @country, @genre, @length,
+      @rating, @director, @actors, @collection, @period =
+        parse_date(date), link, title, year, country, parse_array(genre),
+        length, rating, director, parse_array(actors), collection, period
+    end
+
+    def parse_date(date)
+      Date.parse(date) if date.to_s.length > 7
+    end
+
+    def parse_array(array)
+      array.split(',')
+    end
+
+    def period
+      self.class
+          .name.sub(/^Cinema::(.+)Movie$/, '\1')
+          .downcase
+          .to_sym
     end
 
     def self.create(row, collection)
@@ -29,12 +41,14 @@ module Cinema
       )
     end
 
+    # rubocop:disable CaseEquality
     def self.find_period_setting(movie_parameters)
       _, period_settings = PERIODS.detect do |_period, value|
         value[:years] === movie_parameters['year']
       end
       period_settings
     end
+    # rubocop:enable CaseEquality
 
     def self.check_year(movie_parameters)
       return unless movie_parameters.nil?
@@ -65,6 +79,7 @@ module Cinema
       end
     end
 
+    # rubocop:disable CaseEquality
     def value_match?(value, filter_value)
       if filter_value.is_a?(Array)
         filter_value.any? { |fv| fv === value }
@@ -72,17 +87,7 @@ module Cinema
         filter_value === value
       end
     end
-
-    def assign_parameters(link, title, year, # rubocop:disable ParameterLists
-                          country, date, genre, length, rating,
-                          director, actors, collection)
-      @date = Date.parse(date) if date.to_s.length > 7
-      parameters = [link, title, year, country, genre.split(','),
-                    length, rating, director, actors.split(','),
-                    collection]
-      @link, @title, @year, @country, @genre, @length,
-      @rating, @director, @actors, @collection = parameters
-    end
+    # rubocop:enable CaseEquality
   end
 
   # Movie gets this class if movie year < 1945

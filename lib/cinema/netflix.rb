@@ -37,11 +37,14 @@ module Cinema
         movie_to_show.description
       end
 
-      # rubocop:disable LineLength
       def define_filter(filter_name, from: nil, arg: nil, &block)
-        @custom_filters[filter_name.to_sym] = from ? derive_filter(filter_name, from, arg) : block
+        @custom_filters[filter_name.to_sym] =
+          if from
+            derive_filter(from, arg)
+          else
+            block
+          end
       end
-      # rubocop:enable LineLength
 
       private
 
@@ -54,24 +57,29 @@ module Cinema
 
       def find_suitable_movies(options, &block)
         # Finds movies depending on filter or block
-        if block_given?
-          suitable_movies = filter_with_block(block)
-        else
-          check_filter_exists(options)
-          suitable_movies = custom_filter(options, &block) || filter(options)
-        end
-        got_movies?(suitable_movies)
+        suitable_movies =
+          if block_given?
+            filter_by_block(block)
+          else
+            filter_by_name(options, &block)
+          end
+        check_movies(suitable_movies)
         suitable_movies
       end
 
-      def got_movies?(suitable_movies)
+      def filter_by_name(given_filter, &block)
+        check_filter_exists(given_filter)
+        custom_filter(given_filter, &block) || filter(given_filter)
+      end
+
+      def check_movies(suitable_movies)
         return unless suitable_movies.empty?
         raise 'Не найдено подходящих по фильтрам фильмов.'\
           ' Проверьте правильность ввода.'
       end
 
       def arguments?(filter)
-        return true unless filter.values[0].is_a?(TrueClass)
+        !filter.values[0].is_a?(TrueClass)
       end
 
       def custom_filter(given_filter)
@@ -79,9 +87,9 @@ module Cinema
         known_filter = @custom_filters[filter_name]
         return nil unless known_filter
         if arguments?(given_filter)
-          filter_with_block(known_filter, filter_value)
+          filter_by_block(known_filter, filter_value)
         else
-          filter_with_block(known_filter)
+          filter_by_block(known_filter)
         end
       end
 
@@ -94,7 +102,7 @@ module Cinema
           ' Проверьте правильность ввода.'
       end
 
-      def filter_with_block(proc, *params)
+      def filter_by_block(proc, *params)
         # Filter with user parameter
         if proc.parameters.length > 1
           @movies.select { |movie, _parameter| proc.call(movie, params[0]) }
@@ -104,7 +112,7 @@ module Cinema
         end
       end
 
-      def derive_filter(_new_filter_name, defined_filter, parameter)
+      def derive_filter(defined_filter, parameter)
         custom_filter = @custom_filters[defined_filter]
         proc do |movie, _arg|
           custom_filter.call(movie, parameter)
