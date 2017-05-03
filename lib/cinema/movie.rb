@@ -3,23 +3,15 @@ module Cinema
   class Movie
     attr_reader :link, :title, :year, :country, :date,
                 :genre, :length, :rating, :director,
-                :actors, :collection, :price, :period
+                :actors, :collection, :price
 
     def initialize(link, title, year, country, # rubocop:disable ParameterLists
                    date, genre, length, rating,
                    director, actors, collection)
       @date, @link, @title, @year, @country, @genre, @length,
-      @rating, @director, @actors, @collection, @period =
+      @rating, @director, @actors, @collection =
         parse_date(date), link, title, year, country, parse_array(genre),
-        length, rating, director, parse_array(actors), collection, period
-    end
-
-    def parse_date(date)
-      Date.parse(date) if date.to_s.length > 7
-    end
-
-    def parse_array(array)
-      array.split(',')
+        length, rating, director, parse_array(actors), collection
     end
 
     def period
@@ -31,7 +23,6 @@ module Cinema
 
     def self.create(row, collection)
       period_settings = find_period_setting(row)
-      check_year(period_settings)
       movie_class = period_settings[:movie_class]
       movie_class.new(
         row['link'], row['title'], row['year'],
@@ -41,17 +32,17 @@ module Cinema
       )
     end
 
-    # rubocop:disable CaseEquality
     def self.find_period_setting(movie_parameters)
+      movie_year = movie_parameters['year']
+      check_year(movie_year)
       _, period_settings = PERIODS.detect do |_period, value|
-        value[:years] === movie_parameters['year']
+        value[:years].cover?(movie_year)
       end
       period_settings
     end
-    # rubocop:enable CaseEquality
 
-    def self.check_year(movie_parameters)
-      return unless movie_parameters.nil?
+    def self.check_year(movie_year)
+      return if @acceptable_years.include?(movie_year)
       raise 'У фильма неподходящий год.'\
       ' В базе могут быть только фильмы, снятые с 1900 года по настоящий.'
     end
@@ -88,6 +79,16 @@ module Cinema
       end
     end
     # rubocop:enable CaseEquality
+
+    private
+
+    def parse_date(date)
+      Date.parse(date) if date.to_s.length > 7
+    end
+
+    def parse_array(array)
+      array.split(',')
+    end
   end
 
   # Movie gets this class if movie year < 1945
@@ -164,5 +165,9 @@ module Cinema
         modern: { years: 1968..1999, movie_class: ModernMovie },
         new: { years: 2000..Date.today.cwyear, movie_class: NewMovie }
       }.freeze
+
+    @acceptable_years = PERIODS.map do |_period, value|
+        value[:years].to_a
+      end.flatten
   end
 end
