@@ -37,14 +37,11 @@ module Cinema
       _, period_settings = PERIODS.detect do |_period, value|
         value[:years].cover?(movie_year)
       end
-      check_year(period_settings)
-      period_settings
-    end
-
-    def self.check_year(period_settings)
-      return unless period_settings.nil?
-      raise 'У фильма неподходящий год.'\
+      if period_settings.nil?
+        raise 'У фильма неподходящий год.'\
       ' В базе могут быть только фильмы, снятые с 1900 года по настоящий.'
+      end
+      period_settings
     end
 
     def genre?(genre)
