@@ -34,15 +34,15 @@ module Cinema
 
     def self.find_period_setting(movie_parameters)
       movie_year = movie_parameters['year']
-      check_year(movie_year)
       _, period_settings = PERIODS.detect do |_period, value|
         value[:years].cover?(movie_year)
       end
+      check_year(period_settings)
       period_settings
     end
 
-    def self.check_year(movie_year)
-      return if @acceptable_years.include?(movie_year)
+    def self.check_year(period_settings)
+      return unless period_settings.nil?
       raise 'У фильма неподходящий год.'\
       ' В базе могут быть только фильмы, снятые с 1900 года по настоящий.'
     end
@@ -165,9 +165,5 @@ module Cinema
         modern: { years: 1968..1999, movie_class: ModernMovie },
         new: { years: 2000..Date.today.cwyear, movie_class: NewMovie }
       }.freeze
-
-    @acceptable_years = PERIODS.map do |_period, value|
-        value[:years].to_a
-      end.flatten
   end
 end
