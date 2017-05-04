@@ -8,6 +8,9 @@ module Cinema
 
       attr_accessor :user_balance, :custom_filters
 
+      NO_MOVIES_FOUND_ERROR = 'Не найдено подходящих по фильтрам фильмов.'\
+          ' Проверьте правильность ввода.'.freeze
+
       def initialize(file)
         super
         @custom_filters = {}
@@ -63,19 +66,13 @@ module Cinema
           else
             filter_by_name(options, &block)
           end
-        check_movies(suitable_movies)
+        raise NO_MOVIES_FOUND_ERROR if suitable_movies.empty?
         suitable_movies
       end
 
       def filter_by_name(given_filter, &block)
         check_filter_exists(given_filter)
         custom_filter(given_filter, &block) || filter(given_filter)
-      end
-
-      def check_movies(suitable_movies)
-        return unless suitable_movies.empty?
-        raise 'Не найдено подходящих по фильтрам фильмов.'\
-          ' Проверьте правильность ввода.'
       end
 
       def arguments?(filter)
