@@ -1,0 +1,5 @@
+# Current Style
+# -----------------
+
+Style/ParallelAssignment:
+  Enabled: false
