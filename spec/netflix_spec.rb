@@ -2,6 +2,8 @@ require 'money'
 require 'cinema'
 require 'cinema/money_helper'
 
+I18n.enforce_available_locales = false
+
 describe Cinema::Examples::Netflix do
   using MoneyHelper
 

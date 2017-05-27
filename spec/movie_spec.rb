@@ -8,7 +8,7 @@ describe Cinema::Movie do
 
     let(:wrong_data) { base_data.merge('year' => 2019) }
 
-    subject { Cinema::Movie.create(data, 'collection') }
+    subject { Cinema::Movie.create(data) }
 
     context 'ancient movie' do
       let(:data) { base_data.merge('year' => 1940) }
@@ -31,7 +31,7 @@ describe Cinema::Movie do
     end
 
     it 'throws an error when movie year is not in appropriate diapason' do
-      expect { Cinema::Movie.create(wrong_data, 'collection') }.to raise_error.with_message('У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий.')
+      expect { Cinema::Movie.create(wrong_data) }.to raise_error.with_message('У фильма неподходящий год. В базе могут быть только фильмы, снятые с 1900 года по настоящий.')
     end
   end
 
@@ -43,12 +43,11 @@ describe Cinema::Movie do
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
     subject do
-      Cinema::AncientMovie.new('http://imdb.com/title/tt0034583/?ref_=chttp_tt_32', 'Casablanca', '1942', 'USA', '1943-01-23',
-                               'Drama,Romance,War', '102 min', '8.6', 'Michael Curtiz', 'Humphrey Bogart,Ingrid Bergman,Paul Henreid', collection)
+      Cinema::AncientMovie.new({ 'link' => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', 'title' => 'Double Indemnity', 'year' => '1944', 'country' => 'USA', 'date' => '1944-04-24', 'genre' => 'Crime,Drama,Film-Noir', 'length' => '107 min', 'rating' => '8.4', 'director' => 'Billy Wilder', 'actors' => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson' })
     end
 
     context 'description' do
-      its(:description) { is_expected.to eq('Casablanca - старый фильм 1942') }
+      its(:description) { is_expected.to eq('Double Indemnity - старый фильм 1944') }
     end
 
     context 'initialize' do
@@ -64,12 +63,11 @@ describe Cinema::Movie do
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
     subject do
-      Cinema::ClassicMovie.new('http://imdb.com/title/tt0036868/?ref_=chttp_tt_195', 'The Best Years of Our Lives', '1946', 'USA', '1947-06-17',
-                               'Drama,Romance,War', '172 min', '8.2', 'William Wyler', 'Fredric March,Dana Andrews,Myrna Loy', collection)
+      Cinema::ClassicMovie.new({ 'link' => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', 'title' => 'Double Indemnity', 'year' => '', 'country' => 'USA', 'date' => '1944-04-24', 'genre' => 'Crime,Drama,Film-Noir', 'length' => '107 min', 'rating' => '8.4', 'director' => 'Billy Wilder', 'actors' => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson', 'collection' => collection })
     end
 
     context 'description' do
-      its(:description) { is_expected.to eq('The Best Years of Our Lives - классический фильм William Wyler (ещё 2 его фильмов в списке)') }
+      its(:description) { is_expected.to eq('Double Indemnity - классический фильм Billy Wilder (ещё 4 его фильмов в списке)') }
     end
 
     context 'initialize' do
@@ -85,8 +83,8 @@ describe Cinema::Movie do
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
     subject do
-      Cinema::ModernMovie.new('http://imdb.com/title/tt0111161/?ref_=chttp_tt_1', 'The Shawshank Redemption', '1994', 'USA', '1994-10-14',
-                              'Crime,Drama', '142 min', '9.3', 'Frank Darabont', 'Tim Robbins,Morgan Freeman,Bob Gunton', collection)
+      Cinema::ModernMovie.new( { 'link' => 'http://imdb.com/title/tt0111161/?ref_=chttp_tt_1', 'title' => 'The Shawshank Redemption', 'year' =>'1994', 'country' => 'USA', 'date' => '1994-10-14',
+                              'genre' => 'Crime,Drama', 'length' => '142 min', 'rating' => '9.3', 'actors' => 'Tim Robbins, Morgan Freeman, Bob Gunton', 'collection' => collection } )
     end
 
     context 'description' do
@@ -105,7 +103,7 @@ describe Cinema::Movie do
 
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
-    subject { Cinema::NewMovie.new('http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', 'Memento', 2000, 'USA', '2001-05-25', 'Mystery,Thriller', '113 min', '8.5', 'Christopher Nolan', 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano', collection) }
+    subject { Cinema::NewMovie.new( { 'link' => 'http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', 'title' => 'Memento', 'year' => 2000, 'country' => 'USA','date' => '2001-05-25', 'genre' => 'Mystery,Thriller', 'length' => '113 min', 'rating' => '8.5', 'director' => 'Christopher Nolan',  'actors' => 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano', 'collection' => collection } ) }
 
     context 'description' do
       its(:description) { is_expected.to eq("Memento - новинка, вышло #{Date.today.cwyear - subject.year} лет назад") }

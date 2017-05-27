@@ -31,4 +31,5 @@ RSpec.configure do |config|
 
   APP_ROOT = File.expand_path('../..', __FILE__)
   require 'rspec/its'
+  require 'pry'
 end
