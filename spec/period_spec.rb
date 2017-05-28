@@ -46,4 +46,14 @@ describe Cinema::Examples::Period do
       expect(subject.filters).to eq(title: "The Terminator")
     end
   end
+
+  context 'settings' do
+    its(:settings) {is_expected.to eq(
+       { time: '10:00'..'16:00',
+        filters: {:title=>"The Terminator"},
+        price: 50,
+        hall: [:green, :blue]
+       }
+      )}
+  end
 end

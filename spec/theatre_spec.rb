@@ -109,8 +109,12 @@ describe Cinema::Examples::Theatre do
       expect(theatre.show('18:20')).to eq('Casablanca - старый фильм 1942')
     end
 
-    it 'raises an error if time is not presented in schedule' do
+    it 'raises an error if time is not presented in default schedule' do
       expect { theatre.show('1:20') }.to raise_error.with_message('Наш кинотеатр работает с 6:00 до 23:00. Вы выбрали время 1:20.')
+    end
+
+    it 'raise error if time is not presented in custom schedule' do
+      expect { custom_theatre.show('23:00')}.to raise_error.with_message('Наш кинотеатр работает с 09:00 до 22:00. Вы выбрали время 23:00.')
     end
   end
 

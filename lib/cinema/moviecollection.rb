@@ -45,13 +45,15 @@ module Cinema
     end
 
     def filter(filters)
-      @movies.select { |movie| movie.matches?(filters) }
-      #exclude?(filters)
-    end
-
-    def exclude?(filters)
-      filters.keys.any? do |key|
-        HEADERS.any? { |header| key == "exclude_#{header}" }
+      if exclude_filters?(filters)
+        # Find movies with common filters
+        filtered_movies = @movies.select do |movie| movie.matches?(get_match_filters(filters))
+        end
+        # Reject movies with exclude filters
+        filtered_movies.reject do |movie| movie.matches?(get_exclude_filters(filters))
+        end
+      else
+        @movies.select { |movie| movie.matches?(filters) }
       end
     end
 
@@ -59,6 +61,27 @@ module Cinema
 
     def pick_movie_by_weight(movies)
       movies.sort_by { |movie| rand * movie.rating }[0]
+    end
+
+    def exclude_filters?(filters)
+      filters.any? do |key, value|
+        key.to_s.match(/exclude/)
+      end
+    end
+
+    def get_match_filters(filters)
+      filters.reject { |key, value| key.to_s.match(/exclude/) }
+    end
+
+    def get_exclude_filters(filters)
+      # This method creates common filter from exclude filter
+      exclude_filters = filters.select { |k, v| k.to_s.match(/exclude/) }
+      # Get the right names for keys
+      mappings = exclude_filters.map do
+        |k, v| { k => k.to_s.gsub('exclude_', '').to_sym }
+      end[0]
+      # Assign right names to keys
+      exclude_filters.map {|k, v| [mappings[k], v] }.to_h
     end
   end
 end

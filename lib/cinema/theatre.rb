@@ -3,7 +3,6 @@ module Cinema
     # Movie Theatre Example Class
     class Theatre < Cinema::MovieCollection
       include Cinema::Cashbox
-      include Cinema::Examples::DSLHelper
 
       attr_accessor :hall, :periods
 
@@ -28,11 +27,74 @@ module Cinema
       def initialize(file, &block)
         super
         if block_given?
-          self.class.class_eval(&block)
-          copyvars
+          instance_eval(&block)
         end
         create_schedule
         check_schedule unless periods.nil?
+      end
+
+      def show(time)
+        check_time(time)
+        period = @schedule.select do |_k, v|
+          start_time = v[:time].first
+          end_time = v[:time].last
+         time_range(start_time, end_time).include?(Time.parse(time))
+        end.first
+        movie_to_show = fetch_movie(period[0])
+        puts "Now showing #{movie_to_show.title}"
+        movie_to_show.description
+      end
+
+      def when?(movie_title)
+        selected_movie = filter(title: movie_title)[0]
+        movie_is_presented?(selected_movie)
+        daytime, = @schedule.detect do |_name, options|
+          selected_movie.matches?(options[:filters])
+        end
+        "#{selected_movie.title} показывают с"\
+        " #{@schedule[daytime][:time].first} до"\
+        " #{@schedule[daytime][:time].last}"
+      end
+
+      def cash
+        balance
+      end
+
+      def buy_ticket(movie_title)
+        selected_movie = filter(title: movie_title)[0]
+        movie_is_presented?(selected_movie)
+        _, options = @schedule.detect do |_name, options|
+          selected_movie.matches?(options[:filters])
+        end
+        movie_price = options[:price]
+        replenish_balance(movie_price)
+        "Вы купили билет на #{selected_movie.title}"
+      end
+
+      private
+
+      def hall(color, **attr_hash)
+        @hall ||= []
+        @hall << color
+        @hall << attr_hash
+      end
+
+      def period(range, &period_settings)
+        @periods ||= []
+        p = Period.new(range, &period_settings)
+        @periods << p
+        #p.copyvars
+      end
+
+      def create_schedule
+        @schedule = {}
+        unless periods.nil?
+          periods.each do |period|
+            @schedule[period.time.to_s.to_sym] = period.settings
+          end
+        else
+          @schedule = DEFAULT_SCHEDULE
+        end
       end
 
       def check_schedule
@@ -73,70 +135,6 @@ module Cinema
           error_message << " c #{warning[:time].first} по #{warning[:time].last} в зале #{warning[:hall].to_s};"
         end
         raise StandardError, error_message
-      end
-
-      def show(time)
-        check_time(time)
-        period = @schedule.detect do |_k, v|
-          start_time = v[:time].first
-          end_time = v[:time].last
-         time_range(start_time, end_time).include?(Time.parse(time))
-        end.first
-        movie_to_show = fetch_movie(period)
-        puts "Now showing #{movie_to_show.title}"
-        movie_to_show.description
-      end
-
-      def when?(movie_title)
-        selected_movie = filter(title: movie_title)[0]
-        movie_is_presented?(selected_movie)
-        daytime, = @schedule.detect do |_name, options|
-          selected_movie.matches?(options[:filters])
-        end
-        "#{selected_movie.title} показывают с"\
-        " #{@schedule[daytime][:time].first} до"\
-        " #{@schedule[daytime][:time].last}"
-      end
-
-      def cash
-        balance
-      end
-
-      def buy_ticket(movie_title)
-        selected_movie = filter(title: movie_title)[0]
-        movie_is_presented?(selected_movie)
-        _, options = @schedule.detect do |_name, options|
-          selected_movie.matches?(options[:filters])
-        end
-        movie_price = options[:price]
-        replenish_balance(movie_price)
-        "Вы купили билет на #{selected_movie.title}"
-      end
-
-      def self.hall(color, **attr_hash)
-        @hall ||= []
-        @hall << color
-        @hall << attr_hash
-      end
-
-      def self.period(range, &period_settings)
-        @periods ||= []
-        p = Period.new(range, &period_settings)
-        @periods << p
-        p.copyvars
-      end
-
-      private
-
-      def create_schedule
-        @schedule = {}
-        unless periods.nil?
-          periods.each do |period|
-            @schedule[period.time.to_s.to_sym] = period.schedule
-          end
-        else
-          @schedule = DEFAULT_SCHEDULE
-        end
       end
 
       def time_range(start_time, end_time)

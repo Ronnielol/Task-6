@@ -12,10 +12,21 @@ module Cinema
           ' Проверьте правильность ввода.'.freeze
 
       def initialize(file)
+        #self.class.generate_header_methods
         super
         @custom_filters = {}
         @user_balance = 0.to_money
       end
+
+=begin
+      def self.generate_header_methods
+        HEADERS.each do |header|
+          define_method :"by_#{header}" do
+            Proc.new { |movie, parameter| movie.header.include?(parameter) }
+          end
+        end
+      end
+=end
 
       def pay(amount)
         if amount <= 0

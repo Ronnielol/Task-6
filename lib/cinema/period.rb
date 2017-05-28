@@ -27,7 +27,7 @@ module Cinema
         @filters = filter_hash
       end
 
-      def schedule
+      def settings
         {
           time: time,
           filters: filters,
