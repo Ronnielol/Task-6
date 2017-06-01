@@ -1,29 +1,40 @@
+# frozen_string_literal: true
+
 module Cinema
   module Examples
+    # Theatre period
     class Period
-      include Cinema::Examples::DSLHelper
+      POSSIBLE_NAMES = %w[link title year country date
+                          genre length rating director actors].freeze
 
-      attr_accessor :description, :filters, :price, :hall, :time
+      attr_reader :time
 
       def initialize(range, &block)
-        self.class.class_eval(&block)
+        define_single_arg_methods
+        instance_eval(&block) if block_given?
         @time = range
-        copyvars
       end
 
-      def self.description(string)
-        @description = string
+      def define_single_arg_methods
+        single_arg_meths = %w[description price]
+        single_arg_meths.each do |meth|
+          self.class.class_eval do
+            attr_reader "#{meth}"
+            define_method meth do |arg = nil|
+              return instance_variable_get(:"@#{meth}") if arg.nil?
+              instance_variable_set(:"@#{meth}", arg)
+            end
+          end
+        end
       end
 
-      def self.price(integer)
-        @price = integer
-      end
-
-      def self.hall(*colors)
+      def hall(*colors)
+        return @hall if colors.empty?
         @hall = colors
       end
 
-      def self.filters(**filter_hash)
+      def filters(**filter_hash)
+        return @filters if filter_hash.empty?
         @filters = filter_hash
       end
 
@@ -36,13 +47,17 @@ module Cinema
         }
       end
 
-      def self.method_missing(meth, arg)
-        possible_names = %w[link title year country date
-                 genre length rating director actors]
+      def method_missing(meth, arg)
         meth_name = meth.to_s
-        if possible_names.include?(meth_name)
+        if POSSIBLE_NAMES.include?(meth_name)
           @filters = { meth_name.to_sym => arg }
+        else
+          super
         end
+      end
+
+      def respond_to_missing?(meth, include_all = true)
+        POSSIBLE_NAMES.include?(meth.to_s) || super
       end
     end
   end

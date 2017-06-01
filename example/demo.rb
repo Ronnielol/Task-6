@@ -3,7 +3,6 @@ require 'pry'
 
 using MoneyHelper
 
-=begin
 theatre =
   Cinema::Examples::Theatre.new('lib/movies.txt') do
     hall :red, title: 'Красный зал', places: 100
@@ -17,37 +16,30 @@ theatre =
       hall :red, :blue
     end
 
-    period '11:00'..'16:00' do
-      description 'Спецпоказ'
-      title 'The Terminator'
-      price 50
-      hall :green
-    end
+    # period '11:00'..'16:00' do
+    #   description 'Спецпоказ'
+    #   title 'The Terminator'
+    #   price 50
+    #   hall :green
+    # end
 
-    period '16:00'..'20:00' do
-      description 'Вечерний сеанс'
-      filters genre: ['Action', 'Drama'], year: 2007..Time.now.year
-      price 20
-      hall :red, :blue
-    end
+    # period '16:00'..'20:00' do
+    #   description 'Вечерний сеанс'
+    #   filters genre: ['Action', 'Drama'], year: 2007..Time.now.year
+    #   price 20
+    #   hall :red, :blue
+    # end
 
-    period '19:00'..'22:00' do
-      description 'Вечерний сеанс для киноманов'
-      filters year: 1900..1945, exclude_country: 'USA'
-      price 30
-      hall :green
-    end
+    # period '19:00'..'22:00' do
+    #   description 'Вечерний сеанс для киноманов'
+    #   filters year: 1900..1945, exclude_country: 'USA'
+    #   price 30
+    #   hall :green
+    # end
   end
-=end
 
-#theatre.show('21:00')
 
-#theatre.buy_ticket('Metropolis')
-
-nf = Cinema::Examples::Netflix.new('lib/movies.txt')
-p nf.by_genre.drama
-
-#th = Cinema::Examples::Theatre.new('lib/movies.txt')
+p theatre.period.first.description
 
 =begin
   nf.pay(25)

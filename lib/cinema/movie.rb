@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Cinema
   # Movie class contains info about certain movie
   class Movie
@@ -13,7 +15,7 @@ module Cinema
     attribute :rating, Float
     attribute :director, String
     attribute :actors, Array
-    attribute :collection #?????????
+    attribute :collection
 
     attr_reader :price
 
@@ -50,16 +52,20 @@ module Cinema
     end
 
     def matches?(filters)
-      filters.any? do |filter_name, filter_value|
+      # Creating array for filters check results
+      filter_check_array = filters.map do |filter_name, filter_value|
         match_filter?(filter_name, filter_value)
       end
+      # Returns true only if all filters passed (were 'true' for the movie)
+      filter_check_array.none? { |status| status == false }
     end
 
     def match_filter?(filter_name, filter_value)
-      value = send(filter_name)
-      if value.is_a?(Array)
-        value.any? { |v| value_match?(v, filter_value) }
+      if filter_name =~ /^exclude_(.+)/
+        value = send(Regexp.last_match(1))
+        !value_match?(value, filter_value)
       else
+        value = send(filter_name)
         value_match?(value, filter_value)
       end
     end

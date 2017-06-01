@@ -10,7 +10,7 @@ describe Cinema::Examples::Period do
     end
   }
 
-  let(:filter_method) {
+  let(:period_with_filters) {
     described_class.new('10:00'..'16:00') do
       description 'Спецпоказ'
       filters genre: ['Action', 'Drama'], year: 2007..Time.now.year
@@ -37,7 +37,7 @@ describe Cinema::Examples::Period do
 
   context 'filters' do
     it 'returns given filter' do
-      expect(filter_method.filters).to eq(genre: ['Action', 'Drama'], year: 2007..Time.now.year)
+      expect(period_with_filters.filters).to eq(genre: ['Action', 'Drama'], year: 2007..Time.now.year)
     end
   end
 

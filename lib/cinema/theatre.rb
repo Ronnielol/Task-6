@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Cinema
   module Examples
     # Movie Theatre Example Class
@@ -26,23 +28,25 @@ module Cinema
 
       def initialize(file, &block)
         super
-        if block_given?
-          instance_eval(&block)
-        end
+        instance_eval(&block) if block_given?
         create_schedule
         check_schedule unless periods.nil?
       end
 
       def show(time)
         check_time(time)
-        period = @schedule.select do |_k, v|
-          start_time = v[:time].first
-          end_time = v[:time].last
-         time_range(start_time, end_time).include?(Time.parse(time))
-        end.first
+        period = find_period(time)
         movie_to_show = fetch_movie(period[0])
         puts "Now showing #{movie_to_show.title}"
         movie_to_show.description
+      end
+
+      def find_period(time)
+        @schedule.select do |_k, v|
+          start_time = v[:time].first
+          end_time = v[:time].last
+          time_range(start_time, end_time).include?(Time.parse(time))
+        end.first
       end
 
       def when?(movie_title)
@@ -83,17 +87,17 @@ module Cinema
         @periods ||= []
         p = Period.new(range, &period_settings)
         @periods << p
-        #p.copyvars
+        # p.copyvars
       end
 
       def create_schedule
         @schedule = {}
-        unless periods.nil?
+        if periods.nil?
+          @schedule = DEFAULT_SCHEDULE
+        else
           periods.each do |period|
             @schedule[period.time.to_s.to_sym] = period.settings
           end
-        else
-          @schedule = DEFAULT_SCHEDULE
         end
       end
 
@@ -107,39 +111,39 @@ module Cinema
         periods.each_with_index.map do |period, first_index|
           periods.each_with_index.map do |second_period, second_index|
             # Iterate only if period index is different from clone period index
-            unless (first_index == second_index)
-               # Find joint time between periods
-              joint_time = (period.time.to_a & second_period.time.to_a)
-               # Find joint halls between periods
-              joint_hall = (period.hall & second_period.hall)
-              generate_warning(joint_time, joint_hall)
-            end
+            next if first_index == second_index
+            # Find joint time between periods
+            joint_time = (period.time.to_a & second_period.time.to_a)
+            # Find joint halls between periods
+            joint_hall = (period.hall & second_period.hall)
+            generate_warning(joint_time, joint_hall)
           end
         end
       end
 
       def generate_warning(time, hall)
         # Time and halls array must not be empty
-        if !time.empty? && !hall.empty?
-          # Dont generate false warnings (example: '9:00..'16:00' and '16:00'..'20:00')
-          {time: time, hall: hall} unless (time.first == time.last)
-        end
+        return unless !time.empty? && !hall.empty?
+        # Dont generate false warnings (example: '9:00..'16:00' and '16:00'..'20:00')
+        { time: time, hall: hall } unless time.first == time.last
       end
 
       def show_warnings(warnings)
         # Delete duplicates and nils
         nrmlz_warnings = warnings.flatten.uniq.compact
         return if nrmlz_warnings.empty?
-        error_message = "Пересечения периодов:"
+        error_message = 'Пересечения периодов:'
+        error_message_dup = error_message.dup
         nrmlz_warnings.each do |warning|
-          error_message << " c #{warning[:time].first} по #{warning[:time].last} в зале #{warning[:hall].to_s};"
+          error_message_dup << " c #{warning[:time].first} по"\
+          " #{warning[:time].last} в зале #{warning[:hall]};"
         end
-        raise StandardError, error_message
+        raise StandardError, error_message_dup
       end
 
       def time_range(start_time, end_time)
         # Creates range of time for the period
-        Range.new(Time.parse(start_time),Time.parse(end_time))
+        Range.new(Time.parse(start_time), Time.parse(end_time))
       end
 
       def fetch_movie(period)
@@ -147,15 +151,14 @@ module Cinema
       end
 
       def check_time(time)
-        unless opening_hours.any? {|range| range.include?(Time.parse(time))}
-          raise 'Наш кинотеатр работает с'\
-          " #{@schedule.values.first[:time].first} до"\
-          " #{@schedule.values.last[:time].last}. Вы выбрали время #{time}."
-        end
+        return if opening_hours.any? { |range| range.include?(Time.parse(time)) }
+        raise 'Наш кинотеатр работает с'\
+        " #{@schedule.values.first[:time].first} до"\
+        " #{@schedule.values.last[:time].last}. Вы выбрали время #{time}."
       end
 
       def opening_hours
-        @schedule.map do |range, value|
+        @schedule.map do |_range, value|
           time_range(value[:time].first, value[:time].last)
         end
       end

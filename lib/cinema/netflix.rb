@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Cinema
   module Examples
     # Netflix example class
@@ -9,24 +11,22 @@ module Cinema
       attr_accessor :user_balance, :custom_filters
 
       NO_MOVIES_FOUND_ERROR = 'Не найдено подходящих по фильтрам фильмов.'\
-          ' Проверьте правильность ввода.'.freeze
+          ' Проверьте правильность ввода.'
 
       def initialize(file)
-        #self.class.generate_header_methods
+        self.class.generate_header_methods
         super
         @custom_filters = {}
         @user_balance = 0.to_money
       end
 
-=begin
       def self.generate_header_methods
         HEADERS.each do |header|
           define_method :"by_#{header}" do
-            Proc.new { |movie, parameter| movie.header.include?(parameter) }
+            BlankFilter.new(self, header)
           end
         end
       end
-=end
 
       def pay(amount)
         if amount <= 0

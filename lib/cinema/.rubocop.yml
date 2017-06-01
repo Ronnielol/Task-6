@@ -3,3 +3,12 @@
 
 Style/ParallelAssignment:
   Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 99
+
+Style/TrivialAccessors:
+  IgnoreClassMethods: true
