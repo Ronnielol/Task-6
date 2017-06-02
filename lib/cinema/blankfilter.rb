@@ -35,13 +35,13 @@ module Cinema
         if @header == 'country'
           meth_name = normalize_method_name(meth)
           movies = @collection.select { |movie| filter.call(movie, meth_name) }
-          movies if got_movies?(movies, meth_name)
+          movies if check_movies(movies, meth_name)
         else
           super
         end
       end
 
-      def got_movies?(movies, meth_name)
+      def check_movies(movies, meth_name)
         if movies.empty?
           raise "Фильмы из страны #{meth_name}"\
           ' не найдены. Проверьте правильность ввода.'

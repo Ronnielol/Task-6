@@ -19,7 +19,7 @@ module Cinema
         single_arg_meths = %w[description price]
         single_arg_meths.each do |meth|
           self.class.class_eval do
-            attr_reader "#{meth}"
+            attr_reader meth.to_s
             define_method meth do |arg = nil|
               return instance_variable_get(:"@#{meth}") if arg.nil?
               instance_variable_set(:"@#{meth}", arg)
