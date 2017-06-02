@@ -59,7 +59,6 @@ module Cinema
       end
 
       def respond_to_missing?(meth, include_all = true)
-        # !!!!!!ASK MENTOR ABOUT THIS!!!!!!!
         @header.include?('country') || super
       end
     end

@@ -4,29 +4,29 @@ require 'cinema/money_helper'
 
 describe Cinema::Movie do
   describe 'create' do
-    let(:base_data) { { 'link' => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', 'title' => 'Double Indemnity', 'year' => '', 'country' => 'USA', 'date' => '1944-04-24', 'genre' => 'Crime,Drama,Film-Noir', 'length' => '107 min', 'rating' => '8.4', 'director' => 'Billy Wilder', 'actors' => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson' } }
+    let(:base_data) { { link: 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', title: 'Double Indemnity', year: '', country: 'USA', date: '1944-04-24', genre: 'Crime,Drama,Film-Noir', length: '107 min', rating: '8.4', director: 'Billy Wilder', actors: 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson' } }
 
-    let(:wrong_data) { base_data.merge('year' => 2019) }
+    let(:wrong_data) { base_data.merge(year: 2019) }
 
     subject { Cinema::Movie.create(data) }
 
     context 'ancient movie' do
-      let(:data) { base_data.merge('year' => 1940) }
+      let(:data) { base_data.merge(year: 1940) }
       it { is_expected.to be_a Cinema::AncientMovie }
     end
 
     context 'classic movie' do
-      let(:data) { base_data.merge('year' => 1950) }
+      let(:data) { base_data.merge(year: 1950) }
       it { is_expected.to be_a Cinema::ClassicMovie }
     end
 
     context 'modern movie' do
-      let(:data) { base_data.merge('year' => 1990) }
+      let(:data) { base_data.merge(year: 1990) }
       it { is_expected.to be_a Cinema::ModernMovie }
     end
 
     context 'new movie' do
-      let(:data) { base_data.merge('year' => 2017) }
+      let(:data) { base_data.merge(year: 2017) }
       it { is_expected.to be_a Cinema::NewMovie }
     end
 
@@ -43,7 +43,7 @@ describe Cinema::Movie do
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
     subject do
-      Cinema::AncientMovie.new({ 'link' => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', 'title' => 'Double Indemnity', 'year' => '1944', 'country' => 'USA', 'date' => '1944-04-24', 'genre' => 'Crime,Drama,Film-Noir', 'length' => '107 min', 'rating' => '8.4', 'director' => 'Billy Wilder', 'actors' => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson' })
+      Cinema::AncientMovie.new({ link: 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', title: 'Double Indemnity', year: '1944', country: 'USA', date: '1944-04-24', genre: 'Crime,Drama,Film-Noir', length: '107 min', rating: '8.4', director: 'Billy Wilder', actors: 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson' })
     end
 
     context 'description' do
@@ -63,7 +63,7 @@ describe Cinema::Movie do
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
     subject do
-      Cinema::ClassicMovie.new({ 'link' => 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', 'title' => 'Double Indemnity', 'year' => '', 'country' => 'USA', 'date' => '1944-04-24', 'genre' => 'Crime,Drama,Film-Noir', 'length' => '107 min', 'rating' => '8.4', 'director' => 'Billy Wilder', 'actors' => 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson', 'collection' => collection })
+      Cinema::ClassicMovie.new({ link: 'http://imdb.com/title/tt0036775/?ref_=chttp_tt_81', title: 'Double Indemnity', 'year' => '', country: 'USA', date: '1944-04-24', genre: 'Crime,Drama,Film-Noir', length: '107 min', rating: '8.4', director: 'Billy Wilder', actors: 'Fred MacMurray,Barbara Stanwyck,Edward G. Robinson', collection: collection })
     end
 
     context 'description' do
@@ -83,8 +83,7 @@ describe Cinema::Movie do
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
     subject do
-      Cinema::ModernMovie.new( { 'link' => 'http://imdb.com/title/tt0111161/?ref_=chttp_tt_1', 'title' => 'The Shawshank Redemption', 'year' =>'1994', 'country' => 'USA', 'date' => '1994-10-14',
-                              'genre' => 'Crime,Drama', 'length' => '142 min', 'rating' => '9.3', 'actors' => 'Tim Robbins, Morgan Freeman, Bob Gunton', 'collection' => collection } )
+      Cinema::ModernMovie.new( { link: 'http://imdb.com/title/tt0111161/?ref_=chttp_tt_1', title: 'The Shawshank Redemption', year: '1994', country: 'USA', date: '1994-10-14', genre: 'Crime,Drama', length: '142 min', rating: '9.3', actors: 'Tim Robbins, Morgan Freeman, Bob Gunton', collection: collection } )
     end
 
     context 'description' do
@@ -103,7 +102,7 @@ describe Cinema::Movie do
 
     let(:collection) { Cinema::MovieCollection.new('lib/movies.txt') }
 
-    subject { Cinema::NewMovie.new( { 'link' => 'http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', 'title' => 'Memento', 'year' => 2000, 'country' => 'USA','date' => '2001-05-25', 'genre' => 'Mystery,Thriller', 'length' => '113 min', 'rating' => '8.5', 'director' => 'Christopher Nolan',  'actors' => 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano', 'collection' => collection } ) }
+    subject { Cinema::NewMovie.new( { link: 'http://imdb.com/title/tt0209144/?ref_=chttp_tt_44', title: 'Memento', year: 2000, country: 'USA',date: '2001-05-25', genre: 'Mystery,Thriller', length: '113 min', rating: '8.5', director: 'Christopher Nolan',  actors: 'Guy Pearce,Carrie-Anne Moss,Joe Pantoliano', collection: collection } ) }
 
     context 'description' do
       its(:description) { is_expected.to eq("Memento - новинка, вышло #{Date.today.cwyear - subject.year} лет назад") }
