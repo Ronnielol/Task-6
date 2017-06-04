@@ -87,54 +87,34 @@ module Cinema
         @periods ||= []
         p = Period.new(range, &period_settings)
         @periods << p
-        # p.copyvars
       end
 
       def create_schedule
-        @schedule = {}
         if periods.nil?
           @schedule = DEFAULT_SCHEDULE
         else
-          periods.each do |period|
-            @schedule[period.time.to_s.to_sym] = period.settings
-          end
+          @schedule = periods.map do |period|
+            [period.time.to_s.to_sym, period.to_h]
+          end.to_h
         end
       end
 
       def check_schedule
-        warnings = find_warnings(periods)
+        warnings = check_warnings(periods)
         show_warnings(warnings)
       end
 
-      def find_warnings(periods)
-        # Iterate between periods-array and clone-periods-array to find crossings
-        periods.each_with_index.map do |period, first_index|
-          periods.each_with_index.map do |second_period, second_index|
-            # Iterate only if period index is different from clone period index
-            next if first_index == second_index
-            # Find joint time between periods
-            joint_time = (period.time.to_a & second_period.time.to_a)
-            # Find joint halls between periods
-            joint_hall = (period.hall & second_period.hall)
-            generate_warning(joint_time, joint_hall)
-          end
-        end
-      end
-
-      def generate_warning(time, hall)
-        # Time and halls array must not be empty
-        return unless !time.empty? && !hall.empty?
-        # Dont generate false warnings (example: '9:00..'16:00' and '16:00'..'20:00')
-        { time: time, hall: hall } unless time.first == time.last
+      def check_warnings(periods)
+        periods.combination(2).map do |p1, p2|
+          p1.find_intersections(p2)
+        end.compact
       end
 
       def show_warnings(warnings)
-        # Delete duplicates and nils
-        nrmlz_warnings = warnings.flatten.uniq.compact
-        return if nrmlz_warnings.empty?
+        return if warnings.empty?
         error_message = 'Пересечения периодов:'
         error_message_dup = error_message.dup
-        nrmlz_warnings.each do |warning|
+        warnings.each do |warning|
           error_message_dup << " c #{warning[:time].first} по"\
           " #{warning[:time].last} в зале #{warning[:hall]};"
         end

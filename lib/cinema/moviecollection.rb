@@ -5,8 +5,8 @@ module Cinema
   class MovieCollection
     include Enumerable
 
-    HEADERS = %w[link title year country date
-                 genre length rating director actors].freeze
+    HEADERS = [:link, :title, :year, :country, :date,
+                 :genre, :length, :rating, :director, :actors].freeze
 
     def each(&block)
       @movies.each(&block)
@@ -20,11 +20,9 @@ module Cinema
     end
 
     def get_movie_attrs(row)
-      attrs_from_csv = HEADERS.map do |header|
-        { header.to_sym => row[header] }
-      end
+      attrs_from_csv = row.to_h
       # Add collection to movie attrs
-      attrs_from_csv.inject(&:merge).merge(collection: self)
+      attrs_from_csv.merge(collection: self)
     end
 
     def parse_date(date)

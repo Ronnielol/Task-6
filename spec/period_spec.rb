@@ -1,7 +1,7 @@
 require 'cinema'
 
 describe Cinema::Examples::Period do
-  subject {
+  let(:period_without_filters) {
     described_class.new('10:00'..'16:00') do
       description 'Спецпоказ'
       title 'The Terminator'
@@ -10,7 +10,7 @@ describe Cinema::Examples::Period do
     end
   }
 
-  let(:period_with_filters) {
+  subject {
     described_class.new('10:00'..'16:00') do
       description 'Спецпоказ'
       filters genre: ['Action', 'Drama'], year: 2007..Time.now.year
@@ -36,21 +36,19 @@ describe Cinema::Examples::Period do
   end
 
   context 'filters' do
-    it 'returns given filter' do
-      expect(period_with_filters.filters).to eq(genre: ['Action', 'Drama'], year: 2007..Time.now.year)
-    end
+    its(:filters) {is_expected.to eq(genre: ['Action', 'Drama'], year: 2007..Time.now.year)}
   end
 
   context 'method_missing' do
     it 'creates fitlers method depending on block if no filter given' do
-      expect(subject.filters).to eq(title: "The Terminator")
+      expect(period_without_filters.filters).to eq(title: "The Terminator")
     end
   end
 
-  context 'settings' do
-    its(:settings) {is_expected.to eq(
+  context 'to_h' do
+    its(:to_h) {is_expected.to eq(
        { time: '10:00'..'16:00',
-        filters: {:title=>"The Terminator"},
+        filters: {:genre=>["Action", "Drama"], :year=>2007..2017},
         price: 50,
         hall: [:green, :blue]
        }

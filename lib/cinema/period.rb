@@ -10,22 +10,18 @@ module Cinema
       attr_reader :time
 
       def initialize(range, &block)
-        define_single_arg_methods
         instance_eval(&block) if block_given?
         @time = range
       end
 
-      def define_single_arg_methods
-        single_arg_meths = %w[description price]
-        single_arg_meths.each do |meth|
-          self.class.class_eval do
-            attr_reader meth.to_s
-            define_method meth do |arg = nil|
-              return instance_variable_get(:"@#{meth}") if arg.nil?
-              instance_variable_set(:"@#{meth}", arg)
-            end
-          end
-        end
+      def price(value = nil)
+        return @price unless value
+        @price = value
+      end
+
+      def description(value = nil)
+        return @description unless value
+        @description = value
       end
 
       def hall(*colors)
@@ -38,7 +34,16 @@ module Cinema
         @filters = filter_hash
       end
 
-      def settings
+      def find_intersections(period)
+        # Find time intersections
+        time = (self.time.to_a & period.time.to_a)
+        # Find hall intersections
+        hall = (self.hall & period.hall)
+        return unless intersections_found?(time, hall)
+        { time: time, hall: hall } unless false_intersection?(time, hall)
+      end
+
+      def to_h
         {
           time: time,
           filters: filters,
@@ -58,6 +63,16 @@ module Cinema
 
       def respond_to_missing?(meth, include_all = true)
         POSSIBLE_NAMES.include?(meth.to_s) || super
+      end
+
+      private
+
+      def intersections_found?(time, hall)
+        !time.empty? && !hall.empty?
+      end
+
+      def false_intersection?(time, hall)
+        time.first == time.last
       end
     end
   end

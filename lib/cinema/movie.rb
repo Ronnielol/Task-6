@@ -10,11 +10,11 @@ module Cinema
     attribute :year, Integer
     attribute :country, String
     attribute :date, Date
-    attribute :genre, String
+    attribute :genre, SplitArray
     attribute :length, String
     attribute :rating, Float
     attribute :director, String
-    attribute :actors, Array
+    attribute :actors, SplitArray
     attribute :collection
 
     attr_reader :price
@@ -44,7 +44,7 @@ module Cinema
     end
 
     def genre?(genre)
-      unless @collection.genre_exists?(genre)
+      unless collection.genre_exists?(genre)
         raise ArgumentError, 'Аргумент задан с ошибкой,'\
         ' либо такого жанра не существует.'
       end
@@ -73,22 +73,13 @@ module Cinema
     # rubocop:disable CaseEquality
     def value_match?(value, filter_value)
       if filter_value.is_a?(Array)
-        filter_value.any? { |fv| fv === value }
+        filter_value.any? { |fv| fv === value } if !value.is_a?(SplitArray)
+        !(filter_value & value).empty? if value.is_a?(SplitArray)
       else
         filter_value === value
       end
     end
     # rubocop:enable CaseEquality
-
-    private
-
-    def parse_date(date)
-      Date.parse(date) if date.to_s.length > 7
-    end
-
-    def parse_array(array)
-      array.split(',')
-    end
   end
 
   # Movie gets this class if movie year < 1945
@@ -128,7 +119,7 @@ module Cinema
     end
 
     def description
-      "#{title} - современное кино: играют #{actors.join(', ')}"
+      "#{title} - современное кино: играют #{actors.join(',')}"
     end
   end
 
