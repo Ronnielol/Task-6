@@ -5,11 +5,17 @@ module Cinema
   class MovieCollection
     include Enumerable
 
-    HEADERS = [:link, :title, :year, :country, :date,
-                 :genre, :length, :rating, :director, :actors].freeze
+    HEADERS = %i[link title year country date
+                 genre length rating director actors].freeze
 
     def each(&block)
       @movies.each(&block)
+    end
+
+    def genres
+      map(&:genre)
+        .flatten
+        .uniq
     end
 
     def initialize(file)

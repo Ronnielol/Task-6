@@ -38,4 +38,8 @@ theatre =
     end
   end
 
-p theatre.show('20:00')
+theatre.show('20:00')
+
+netflix = Cinema::Examples::Netflix.new('lib/movies.txt')
+netflix.by_country.germany
+netflix.by_genre.sci_fi

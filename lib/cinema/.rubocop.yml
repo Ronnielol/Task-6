@@ -1,6 +1,11 @@
 # Current Style
 # -----------------
 
+Style/CaseEquality:
+  Exclude:
+    # - 'lib/cinema/movie.rb' y not working!?
+    - '**/movie.rb' # working!
+
 Style/ParallelAssignment:
   Enabled: false
 

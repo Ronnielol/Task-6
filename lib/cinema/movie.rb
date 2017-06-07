@@ -70,16 +70,29 @@ module Cinema
       end
     end
 
-    # rubocop:disable CaseEquality
     def value_match?(value, filter_value)
       if filter_value.is_a?(Array)
-        filter_value.any? { |fv| fv === value } if !value.is_a?(SplitArray)
-        !(filter_value & value).empty? if value.is_a?(SplitArray)
+        value_match_array?(value, filter_value)
+      else
+        value_match_string?(value, filter_value)
+      end
+    end
+
+    def value_match_array?(value, filter_value)
+      if value.is_a?(Array)
+        !(filter_value & value).empty?
+      else
+        filter_value.any? { |fv| fv === value }
+      end
+    end
+
+    def value_match_string?(value, filter_value)
+      if value.is_a?(Array)
+        value.include?(filter_value)
       else
         filter_value === value
       end
     end
-    # rubocop:enable CaseEquality
   end
 
   # Movie gets this class if movie year < 1945

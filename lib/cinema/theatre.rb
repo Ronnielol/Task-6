@@ -90,13 +90,13 @@ module Cinema
       end
 
       def create_schedule
-        if periods.nil?
-          @schedule = DEFAULT_SCHEDULE
-        else
-          @schedule = periods.map do |period|
-            [period.time.to_s.to_sym, period.to_h]
-          end.to_h
-        end
+        @schedule = if periods.nil?
+                      DEFAULT_SCHEDULE
+                    else
+                      periods.map do |period|
+                        [period.time.to_s.to_sym, period.to_h]
+                      end.to_h
+                    end
       end
 
       def check_schedule
