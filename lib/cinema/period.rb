@@ -39,8 +39,8 @@ module Cinema
         time = (self.time.to_a & period.time.to_a)
         # Find hall intersections
         hall = (self.hall & period.hall)
-        return unless !time.empty? && !hall.empty?
-        { time: time, hall: hall } if time.size > 1
+        return if (time.size < 2) || hall.empty?
+        { time: time, hall: hall }
       end
 
       def to_h

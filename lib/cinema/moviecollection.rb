@@ -13,9 +13,7 @@ module Cinema
     end
 
     def genres
-      map(&:genre)
-        .flatten
-        .uniq
+      flat_map(&:genre).uniq
     end
 
     def initialize(file)
