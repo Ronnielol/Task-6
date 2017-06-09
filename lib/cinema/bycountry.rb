@@ -16,9 +16,9 @@ module Cinema
         movies if check_movies(movies, meth_name)
       end
 
-      # def respond_to_missing?(meth, include_all = true)
-      #   !@movies.empty? || super
-      # end
+      def respond_to_missing?(meth)
+        @collection.any? { |movie| country_match_regexp(movie, meth.to_s) }
+      end
 
       private
 
