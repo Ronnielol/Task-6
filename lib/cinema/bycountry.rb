@@ -13,7 +13,7 @@ module Cinema
         movies = @collection.select do |movie|
           country_match_regexp(movie, meth_name)
         end
-        movies if check_movies(movies, meth_name)
+        super if movies.empty?
       end
 
       def respond_to_missing?(meth)
@@ -24,12 +24,6 @@ module Cinema
 
       def country_match_regexp(movie, parameter)
         movie.country =~ Regexp.new(parameter.to_s, Regexp::IGNORECASE)
-      end
-
-      def check_movies(movies, meth_name)
-        return unless movies.empty?
-        raise "Фильмы из страны #{meth_name}"\
-          ' не найдены. Проверьте правильность ввода.'
       end
     end
   end
