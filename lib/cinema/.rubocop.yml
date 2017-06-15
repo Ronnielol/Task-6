@@ -1,5 +1,19 @@
 # Current Style
 # -----------------
 
+Style/CaseEquality:
+  Exclude:
+    # - 'lib/cinema/movie.rb' y not working!?
+    - '**/movie.rb' # working!
+
 Style/ParallelAssignment:
   Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 99
+
+Style/TrivialAccessors:
+  IgnoreClassMethods: true

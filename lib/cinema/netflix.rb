@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Cinema
   module Examples
     # Netflix example class
@@ -9,12 +11,20 @@ module Cinema
       attr_accessor :user_balance, :custom_filters
 
       NO_MOVIES_FOUND_ERROR = 'Не найдено подходящих по фильтрам фильмов.'\
-          ' Проверьте правильность ввода.'.freeze
+          ' Проверьте правильность ввода.'
 
       def initialize(file)
         super
         @custom_filters = {}
         @user_balance = 0.to_money
+      end
+
+      def by_genre
+        Cinema::Examples::ByGenre.new(self)
+      end
+
+      def by_country
+        Cinema::Examples::ByCountry.new(self)
       end
 
       def pay(amount)
@@ -93,7 +103,7 @@ module Cinema
       def check_filter_exists(filter)
         # Raises error if filter does not exist in custom filters hash
         # or movie parameters
-        filter_name = filter.keys[0].to_s
+        filter_name = filter.keys[0]
         return unless !custom_filter?(filter) && !HEADERS.include?(filter_name)
         raise StandardError, "Фильтр #{filter.keys[0]} не найден."\
           ' Проверьте правильность ввода.'

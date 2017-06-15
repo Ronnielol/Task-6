@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Numbers to money convertion
 module MoneyHelper
   refine Numeric do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Cinema
   # Cashbox module adds balance and balance methods to object
   module Cashbox

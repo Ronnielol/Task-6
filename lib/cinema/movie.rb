@@ -1,18 +1,23 @@
+# frozen_string_literal: true
+
 module Cinema
   # Movie class contains info about certain movie
   class Movie
-    attr_reader :link, :title, :year, :country, :date,
-                :genre, :length, :rating, :director,
-                :actors, :collection, :price
+    include Virtus.model
 
-    def initialize(link, title, year, country, # rubocop:disable ParameterLists
-                   date, genre, length, rating,
-                   director, actors, collection)
-      @date, @link, @title, @year, @country, @genre, @length,
-      @rating, @director, @actors, @collection =
-        parse_date(date), link, title, year, country, parse_array(genre),
-        length, rating, director, parse_array(actors), collection
-    end
+    attribute :link, String
+    attribute :title, String
+    attribute :year, Integer
+    attribute :country, String
+    attribute :date, Date
+    attribute :genre, SplitArray
+    attribute :length, String
+    attribute :rating, Float
+    attribute :director, String
+    attribute :actors, SplitArray
+    attribute :collection
+
+    attr_reader :price
 
     def period
       self.class
@@ -21,19 +26,13 @@ module Cinema
           .to_sym
     end
 
-    def self.create(row, collection)
-      period_settings = find_period_setting(row)
+    def self.create(attribute_hash)
+      period_settings = find_period_setting(attribute_hash[:year])
       movie_class = period_settings[:movie_class]
-      movie_class.new(
-        row['link'], row['title'], row['year'],
-        row['country'], row['date'], row['genre'],
-        row['length'], row['rating'], row['director'],
-        row['actors'], collection
-      )
+      movie_class.new(attribute_hash)
     end
 
-    def self.find_period_setting(movie_parameters)
-      movie_year = movie_parameters['year']
+    def self.find_period_setting(movie_year)
       _, period_settings = PERIODS.detect do |_period, value|
         value[:years].cover?(movie_year)
       end
@@ -45,7 +44,7 @@ module Cinema
     end
 
     def genre?(genre)
-      unless @collection.genre_exists?(genre)
+      unless collection.genre_exists?(genre)
         raise ArgumentError, 'Аргумент задан с ошибкой,'\
         ' либо такого жанра не существует.'
       end
@@ -53,51 +52,56 @@ module Cinema
     end
 
     def matches?(filters)
-      filters.any? do |filter_name, filter_value|
+      # Creating array for filters check results
+      filter_check_array = filters.map do |filter_name, filter_value|
         match_filter?(filter_name, filter_value)
       end
+      # Returns true only if all filters passed (were 'true' for the movie)
+      filter_check_array.none? { |status| status == false }
     end
 
     def match_filter?(filter_name, filter_value)
-      value = send(filter_name)
-      if value.is_a?(Array)
-        value.any? { |v| value_match?(v, filter_value) }
+      if filter_name =~ /^exclude_(.+)/
+        value = send(Regexp.last_match(1))
+        !value_match?(value, filter_value)
       else
+        value = send(filter_name)
         value_match?(value, filter_value)
       end
     end
 
-    # rubocop:disable CaseEquality
     def value_match?(value, filter_value)
       if filter_value.is_a?(Array)
+        value_match_array?(value, filter_value)
+      else
+        value_match_string?(value, filter_value)
+      end
+    end
+
+    def value_match_array?(value, filter_value)
+      if value.is_a?(Array)
+        !(filter_value & value).empty?
+      else
         filter_value.any? { |fv| fv === value }
+      end
+    end
+
+    def value_match_string?(value, filter_value)
+      if value.is_a?(Array)
+        value.include?(filter_value)
       else
         filter_value === value
       end
-    end
-    # rubocop:enable CaseEquality
-
-    private
-
-    def parse_date(date)
-      Date.parse(date) if date.to_s.length > 7
-    end
-
-    def parse_array(array)
-      array.split(',')
     end
   end
 
   # Movie gets this class if movie year < 1945
   class AncientMovie < Movie
     using MoneyHelper
-    # rubocop:disable ParameterLists
-    def initialize(link, title, year, country, date,
-                   genre, length, rating, director, actors, collection)
+    def initialize(attribute_hash)
       super
       @price = 1.to_money
     end
-    # rubocop:enable ParameterLists
 
     def description
       "#{title} - старый фильм #{year}"
@@ -107,13 +111,10 @@ module Cinema
   # Movie gets this class if movie year 1945..1967
   class ClassicMovie < Movie
     using MoneyHelper
-    # rubocop:disable ParameterLists
-    def initialize(link, title, year, country, date,
-                   genre, length, rating, director, actors, collection)
+    def initialize(attribute_hash)
       super
       @price = 1.5.to_money
     end
-    # rubocop:enable ParameterLists
 
     def description
       "#{title} - классический фильм #{director}"\
@@ -125,30 +126,24 @@ module Cinema
   # Movie gets this class if movie year 1968..1999
   class ModernMovie < Movie
     using MoneyHelper
-    # rubocop:disable ParameterLists
-    def initialize(link, title, year, country, date,
-                   genre, length, rating, director, actors, collection)
+    def initialize(attribute_hash)
       super
       @price = 3.to_money
     end
 
-    # rubocop:enable ParameterLists
     def description
-      "#{title} - современное кино: играют #{actors.join(', ')}"
+      "#{title} - современное кино: играют #{actors.join(',')}"
     end
   end
 
   # Movie gets this class if movie year 2000..today
   class NewMovie < Movie
     using MoneyHelper
-    # rubocop:disable ParameterLists
-    def initialize(link, title, year, country, date,
-                   genre, length, rating, director, actors, collection)
+    def initialize(attribute_hash)
       super
       @price = 5.to_money
     end
 
-    # rubocop:enable ParameterLists
     def description
       "#{title} - новинка, вышло #{Date.today.cwyear - year.to_i} лет назад"
     end
