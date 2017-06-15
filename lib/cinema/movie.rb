@@ -93,6 +93,22 @@ module Cinema
         filter_value === value
       end
     end
+
+    def to_h
+      {
+        imdb_id: link.split('/')[4],
+        title: title,
+        link: link,
+        year: year,
+        country: country,
+        date: date,
+        genre: genre,
+        length: length,
+        rating: rating,
+        director: director,
+        actors: actors
+      }
+    end
   end
 
   # Movie gets this class if movie year < 1945
