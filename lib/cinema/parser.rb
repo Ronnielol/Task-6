@@ -3,12 +3,13 @@ module Cinema
 
     TMDB_KEY = "6e73fb47bbd523d5291b70dd329bb05a"
 
-    attr_reader :movies_info
+    attr_reader :movies_info, :data
 
     def initialize(moviecollection)
       @moviecollection = moviecollection
       @movies_info = get_movies_info(@moviecollection)
       Tmdb::Api.key(TMDB_KEY)
+      @data = get_data
       @template = template
     end
 
@@ -63,14 +64,17 @@ module Cinema
     end
 
     def save_to_html
-      file = File.open('body.html') { |f| Nokogiri::HTML(f) }
+      # Gets main page tempale (body.html) and adds to it
+      # movie cards after <h1> tag.
+      # Result will be saved to 'movies.html'.
+      file = File.open('example/body.html') { |f| Nokogiri::HTML(f) }
       file.at_css('h1').add_next_sibling(render)
-      File.open('movies.html', 'w') { |f| f.write(file) }
+      File.open('example/movies.html', 'w') { |f| f.write(file) }
     end
 
     def save_to_yml
-      yml_structure = get_data.to_yaml
-      File.open("data.yml", "w") do |file|
+      yml_structure = data.to_yaml
+      File.open("example/data.yml", "w") do |file|
         file.puts yml_structure
       end
     end
@@ -80,7 +84,6 @@ module Cinema
     end
 
     def template
-      @data = get_data
       %{
         <div class="row" style="margin-bottom: 20px">
         <% cards_count = 0 %>
