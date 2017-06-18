@@ -56,7 +56,7 @@ module Cinema
 
     def parse_budget(page)
       return if page.at('h4:contains("Budget:")').nil?
-      budget = page.at('h4:contains("Budget:")').parent.text.gsub(/\D/, '')
+      page.at('h4:contains("Budget:")').parent.text.gsub(/\D/, '')
     end
 
     def page(link)
@@ -92,20 +92,36 @@ module Cinema
           <% movie_data = movie_hash.values.first %>
               <div class="col-3">
                 <div class="card">
-                  <img class="card-img-top" src="<%= movie_data[:poster_url] %>" alt="<%= movie_hash[:title] %>">
+                  <img class="card-img-top" src="<%= movie_data[:poster_url] %>" alt="<%= movie_hash.keys.first %>">
                   <div class="card-block">
-                    <h4 class="card-title"><%= movie_hash[:title] %></h4>
+                    <h4 class="card-title"><%= movie_hash.keys.first %></h4>
                     <p class="card-text">
                       <b>Director:</b> <%= movie_data[:director] %> <br />
                       <b>Budget:</b> <%= movie_data[:budget] %>$ <br />
                       <b>Year:</b> <%= movie_data[:year] %> <br />
+                      <b>Country:</b> <%= movie_data[:country] %> <br />
+                      <b>Date:</b> <%= movie_data[:date].strftime('%d %b %Y') %> <br />
+                      <b>Genre:</b>
+                        <% movie_data[:genre].each_with_index do |genre, i|%>
+                          <%= genre %>
+                          <%= ',' if i < (movie_data[:genre].size - 1) %>
+                        <% end %>
+                        <br />
+                      <b>Length:</b> <%= movie_data[:length] %> <br />
+                      <b>Rating:</b> <%= movie_data[:rating] %> <br />
+                      <b>Actors:</b>
+                      <% movie_data[:actors].each_with_index do |actor, i| %>
+                        <%= actor %>
+                        <%= ',' if i < (movie_data[:actors].size - 1) %>
+                      <% end %>
+                      <br />
                     </p>
                   </div>
                 </div>
               </div>
               <% if cards_count%4 == 0 %>
                 </div>
-                <div class="row">
+                <%= '<div class="row">' unless index == @data.size %>
               <% end %>
         <% end %>
       }
