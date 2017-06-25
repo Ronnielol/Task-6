@@ -1,7 +1,9 @@
-module Cinema
-  class Parser
+# frozen_string_literal: true
 
-    TMDB_KEY = "6e73fb47bbd523d5291b70dd329bb05a"
+module Cinema
+  # Uses info from imdb and tmdb for generating html file.
+  class Parser
+    TMDB_KEY = YAML.load_file('config/keys.sample.yml')['tmdb_key']
 
     attr_reader :movies_info, :data
 
@@ -10,20 +12,17 @@ module Cinema
       @movies_info = get_movies_info(@moviecollection)
       Tmdb::Api.key(TMDB_KEY)
       @data = get_data
-      @template = template
     end
 
     def get_movies_info(moviecollection)
-      moviecollection.map do |movie|
-        movie.to_h
-      end
+      moviecollection.map(&:to_h)
     end
 
     def get_data
       # Returns hash with all movies info including budget, poster
       # and alternative titles.
       progressbar = ProgressBar.create(total: movies_info.length)
-      movies_info.map do |movie_hash|
+      movies_info.first(2).map do |movie_hash|
         progressbar.increment
         parse_data(movie_hash)
       end
@@ -33,12 +32,11 @@ module Cinema
       tmdb_movie_id = get_tmdb_movie_id(movie_hash[:imdb_id])
       imdb_page = page(movie_hash[:link])
       title = movie_hash[:title]
-      {title => {
+      { title => {
         budget: parse_budget(imdb_page),
         poster_url: get_poster_url(width: 185, id: tmdb_movie_id),
         alternative_titles: get_alternative_titles(tmdb_movie_id)
-        }.merge(movie_hash)
-      }
+      }.merge(movie_hash) }
     end
 
     def get_poster_url(width: 185, id: nil)
@@ -64,67 +62,16 @@ module Cinema
     end
 
     def save_to_html
-      # Gets main page tempale (body.html) and adds to it
-      # movie cards after <h1> tag.
-      # Result will be saved to 'movies.html'.
-      file = File.open('example/body.html') { |f| Nokogiri::HTML(f) }
-      file.at_css('h1').add_next_sibling(render)
-      File.open('example/movies.html', 'w') { |f| f.write(file) }
+      body_file = File.read('example/body.html.erb')
+      File.write('example/movies.html', render(body_file))
     end
 
     def save_to_yml
-      yml_structure = data.to_yaml
-      File.open("example/data.yml", "w") do |file|
-        file.puts yml_structure
-      end
+      File.write('example/data.yml', data.to_yaml)
     end
 
-    def render
-      ERB.new(@template).result(binding)
-    end
-
-    def template
-      %{
-        <div class="row" style="margin-bottom: 20px">
-        <% cards_count = 0 %>
-        <% @data.each_with_index do |movie_hash, index| %>
-          <% cards_count += 1 %>
-          <% movie_data = movie_hash.values.first %>
-              <div class="col-3">
-                <div class="card">
-                  <img class="card-img-top" src="<%= movie_data[:poster_url] %>" alt="<%= movie_hash.keys.first %>">
-                  <div class="card-block">
-                    <h4 class="card-title"><%= movie_hash.keys.first %></h4>
-                    <p class="card-text">
-                      <b>Director:</b> <%= movie_data[:director] %> <br />
-                      <b>Budget:</b> <%= movie_data[:budget] %>$ <br />
-                      <b>Year:</b> <%= movie_data[:year] %> <br />
-                      <b>Country:</b> <%= movie_data[:country] %> <br />
-                      <b>Date:</b> <%= movie_data[:date].strftime('%d %b %Y') %> <br />
-                      <b>Genre:</b>
-                        <% movie_data[:genre].each_with_index do |genre, i|%>
-                          <%= genre %>
-                          <%= ',' if i < (movie_data[:genre].size - 1) %>
-                        <% end %>
-                        <br />
-                      <b>Length:</b> <%= movie_data[:length] %> <br />
-                      <b>Rating:</b> <%= movie_data[:rating] %> <br />
-                      <b>Actors:</b>
-                      <% movie_data[:actors].each_with_index do |actor, i| %>
-                        <%= actor %>
-                        <%= ',' if i < (movie_data[:actors].size - 1) %>
-                      <% end %>
-                      <br />
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <% if cards_count%4 == 0 %>
-                </div>
-                <%= '<div class="row">' unless index == @data.size %>
-              <% end %>
-        <% end %>
-      }
+    def render(template)
+      ERB.new(template).result(binding)
     end
   end
 end

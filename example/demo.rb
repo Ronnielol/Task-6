@@ -8,8 +8,6 @@ parser = Cinema::Parser.new(moviecollection)
 parser.save_to_yml
 parser.save_to_html
 
-p Nokogiri::HTML(File.read('movies.html')).at_css('.container').children.length
-
 # yml_structure = data.to_yaml
 # File.open("data.yml", "w") do |file|
 #   file.puts yml_structure

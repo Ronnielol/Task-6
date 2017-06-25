@@ -6,6 +6,9 @@ Style/CaseEquality:
     # - 'lib/cinema/movie.rb' y not working!?
     - '**/movie.rb' # working!
 
+Style/AccessorMethodName:
+  Enabled: false
+
 Style/ParallelAssignment:
   Enabled: false
 
