@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/cinema'
+require 'slop'
+
+opts = Slop.parse do |o|
+  o.integer '--pay', 'amount'
+  o.string '--show', 'filter'
+end
+
+netflix = Cinema::Examples::Netflix.new('data/movies.txt')
+netflix.pay(opts[:pay])
+filter_key = opts[:show].split(':').first.to_sym
+filter_value = opts[:show].split(':').last
+netflix.show(filter_key => filter_value)
