@@ -3,7 +3,6 @@
 ## Description
 
 With Cinema gem you can:
- * 
  * Manage movie theatre repertoire and periods.
  * Import movies from CSV.
  * Export collection to YAML or HTML.
@@ -163,4 +162,31 @@ theatre.take('Bank')
 
 theatre.balance
 => #<Money fractional:000 currency:USD>
+```
+
+## Build HTML page with collection data
+
+Parser class makes requests to TMDB API to grab some data, so you need to set your TMDB API Key in 'config/keys.yml'.
+
+Then create new parser instance:
+```ruby
+collection = Cinema::MovieCollection.new('./lib/movies.txt')
+parser = Parser.new(collection)
+```
+Parser grabs movie poster, budget and alternative titles from tmdb and imdb.
+
+Now you can save your data to html page:
+```ruby
+parser.save_to_html
+```
+
+ ![Alt text](https://image.prntscr.com/image/eF590cizQouMXjtQoOOvNQ.png)
+
+## Build YAML file with collection data
+
+Same as for HTML, set your TMDB API Key in 'config/keys.yml' first.
+
+After creating new Parser instance:
+```ruby
+parser.save_to_yml
 ```
